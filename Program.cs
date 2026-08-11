@@ -28,7 +28,7 @@ namespace OrganismSim
             DiagnosisType chosenType;
             var input = Console.ReadLine();
 
-            if (int.TryParse(input, out int choice) && choice >= 1 && choice < profiles.Count)
+            if (int.TryParse(input, out int choice) && choice >= 1 && choice <= profiles.Count)
             {
                 chosenType = profiles[choice - 1].Type;
             }
