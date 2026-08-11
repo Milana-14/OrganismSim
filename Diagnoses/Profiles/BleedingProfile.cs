@@ -5,7 +5,7 @@ namespace OrganismSim.Diagnoses;
 public class BleedingProfile : IDiagnosisProfile
 {
     public DiagnosisType Type => DiagnosisType.Bleeding;
-    public string DisplayName => "Силно кървене (порезна рана)";
+    public string DisplayName => "Силно кървене";
 
     public void Initialize(Patient patient)
     {
