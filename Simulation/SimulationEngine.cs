@@ -30,7 +30,6 @@ public sealed class SimulationEngine
             PrintIntro();
 
             SimulationOutcome? outcome = null;
-            PrintStatus();
             while (outcome is null)
             {
                 var choice = ReadMenuChoice();
