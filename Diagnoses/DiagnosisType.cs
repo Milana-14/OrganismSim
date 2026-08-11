@@ -2,9 +2,15 @@ namespace OrganismSim.Diagnoses;
 
 public enum DiagnosisType
 {
-    Hypoglycemia,
     Bleeding,
     MyocardialInfarction,
     Stroke,
-    Fall
+    Hypoglycemia,
+    Hyperglycemia,
+    Fall,
+    Anaphylaxis,
+    MildAllergicReaction,
+    Hypothermia,
+    Hyperthermia,
+    Dehydration,
 }

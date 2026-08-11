@@ -23,6 +23,8 @@ public sealed class HomeostasisEngine
     
     private static double RecoveryRateFor(ParameterType type)
     {
-        return type == ParameterType.IntracranialPressure ? 0.05 : 0.01; // balance
+        if (type == ParameterType.IntracranialPressure) return 0.05; // balance
+        if (type == ParameterType.BloodVolume) return 0.005; // balance
+        return 0.01;
     }
 }

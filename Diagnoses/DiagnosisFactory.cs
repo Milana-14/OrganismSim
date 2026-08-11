@@ -7,11 +7,17 @@ public static class DiagnosisFactory
 {
     private static readonly Dictionary<DiagnosisType, IDiagnosisProfile> Profiles = new()
     {
-        [DiagnosisType.Hypoglycemia] = new HypoglycemiaProfile(),
         [DiagnosisType.Bleeding] = new BleedingProfile(),
         [DiagnosisType.MyocardialInfarction] = new MyocardialInfarctionProfile(),
         [DiagnosisType.Stroke] = new StrokeProfile(),
+        [DiagnosisType.Hypoglycemia] = new HypoglycemiaProfile(),
+        [DiagnosisType.Hyperglycemia] = new HyperglycemiaProfile(),
         [DiagnosisType.Fall] = new FallProfile(),
+        [DiagnosisType.Anaphylaxis] = new AnaphylaxisProfile(),
+        [DiagnosisType.MildAllergicReaction] = new MildAllergicReactionProfile(),
+        [DiagnosisType.Hypothermia] =  new HypothermiaProfile(),
+        [DiagnosisType.Hyperthermia] = new MildAllergicReactionProfile(),
+        [DiagnosisType.Dehydration] = new DehydrationProfile(),
     };
     public static IDiagnosisProfile GetProfile(DiagnosisType type) => Profiles[type];
     public static IReadOnlyList<IDiagnosisProfile> AllProfiles() => Profiles.Values.ToList();

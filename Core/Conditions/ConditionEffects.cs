@@ -8,7 +8,7 @@ public sealed class ExternalBleedingEffect : IConditionEffect
 
     public void ApplyTick(Patient patient, int seconds, double severity)
     {
-        patient.Physiology.Adjust(ParameterType.BloodVolume, seconds * -severity * 0.074); // balance
+        patient.Physiology.Adjust(ParameterType.BloodVolume, seconds * -severity * 0.042); // balance
     }
 }
 
@@ -139,16 +139,6 @@ public sealed class HyperglycemiaEffect : IConditionEffect
     }
 }
 
-public sealed class DehydrationEffect : IConditionEffect
-{
-    public ConditionType Type => ConditionType.Dehydration;
-
-    public void ApplyTick(Patient patient, int seconds, double severity)
-    {
-        patient.Physiology.Adjust(ParameterType.BloodVolume, seconds * -severity * 0.25); // balance
-    }
-}
-
 public sealed class SeizureEffect : IConditionEffect
 {
     public ConditionType Type => ConditionType.Seizure;
@@ -162,6 +152,63 @@ public sealed class SeizureEffect : IConditionEffect
         patient.Pathology.Adjust(ConditionType.Seizure, seconds * -0.3); // balance (отшумяване)
     }
 }
+
+
+
+public sealed class MildAllergicReactionEffect : IConditionEffect
+{
+    public ConditionType Type => ConditionType.MildAllergicReaction;
+
+    public void ApplyTick(Patient patient, int seconds, double severity)
+    {
+        patient.Physiology.Adjust(ParameterType.Stress, seconds * severity * 0.1); // balance
+        patient.Physiology.Adjust(ParameterType.Pain, seconds * severity * 0.1); // balance
+    }
+}
+
+public sealed class AnaphylaxisEffect : IConditionEffect
+{
+    public ConditionType Type => ConditionType.Anaphylaxis;
+
+    public void ApplyTick(Patient patient, int seconds, double severity)
+    {
+        patient.Physiology.Adjust(ParameterType.PeripheralVascularResistance, seconds * -severity * 0.3); // balance
+        patient.Pathology.Adjust(ConditionType.AirwayObstruction, seconds * severity * 0.3); // balance
+        patient.Physiology.Adjust(ParameterType.Stress, seconds * severity * 0.3); // balance
+    }
+}
+
+public sealed class HypothermiaEffect : IConditionEffect
+{
+    public ConditionType Type => ConditionType.Hypothermia;
+
+    public void ApplyTick(Patient patient, int seconds, double severity)
+    {
+        patient.Physiology.Adjust(ParameterType.BodyTemperature, seconds * -severity * 0.1); // balance
+    }
+}
+
+public sealed class HyperthermiaEffect : IConditionEffect
+{
+    public ConditionType Type => ConditionType.Hyperthermia;
+
+    public void ApplyTick(Patient patient, int seconds, double severity)
+    {
+        patient.Physiology.Adjust(ParameterType.BodyTemperature, seconds * severity * 0.1); // balance
+    }
+}
+
+public sealed class DehydrationEffect : IConditionEffect
+{
+    public ConditionType Type => ConditionType.Dehydration;
+
+    public void ApplyTick(Patient patient, int seconds, double severity)
+    {
+        patient.Physiology.Adjust(ParameterType.BloodVolume, seconds * -severity * 0.04); // balance
+    }
+}
+
+
 
 public sealed class IncreasedSympatheticActivityEffect : IConditionEffect
 {
@@ -186,53 +233,5 @@ public sealed class IncreasedParasympatheticActivityEffect : IConditionEffect
         patient.Physiology.Adjust(ParameterType.PeripheralVascularResistance, seconds * -severity * 0.25); // balance
         patient.Physiology.Adjust(ParameterType.RespiratoryRate, seconds * -severity * 0.1); // balance
         patient.Physiology.Adjust(ParameterType.Stress, seconds * -severity * 0.25); // balance
-    }
-}
-
-
-
-
-
-
-public sealed class HypothermiaEffect : IConditionEffect
-{
-    public ConditionType Type => ConditionType.Hypothermia;
-
-    public void ApplyTick(Patient patient, int seconds, double severity)
-    {
-        patient.Physiology.Adjust(ParameterType.BodyTemperature, seconds * -severity * 0.1); // balance
-    }
-}
-
-public sealed class HyperthermiaEffect : IConditionEffect
-{
-    public ConditionType Type => ConditionType.Hyperthermia;
-
-    public void ApplyTick(Patient patient, int seconds, double severity)
-    {
-        patient.Physiology.Adjust(ParameterType.BodyTemperature, seconds * severity * 0.1); // balance
-    }
-}
-
-public sealed class MildAllergicReactionEffect : IConditionEffect
-{
-    public ConditionType Type => ConditionType.MildAllergicReaction;
-
-    public void ApplyTick(Patient patient, int seconds, double severity)
-    {
-        patient.Physiology.Adjust(ParameterType.Stress, seconds * severity * 0.1); // balance
-        patient.Physiology.Adjust(ParameterType.Pain, seconds * severity * 0.1); // balance
-    }
-}
-
-public sealed class AnaphylaxisEffect : IConditionEffect
-{
-    public ConditionType Type => ConditionType.Anaphylaxis;
-
-    public void ApplyTick(Patient patient, int seconds, double severity)
-    {
-        patient.Physiology.Adjust(ParameterType.PeripheralVascularResistance, seconds * -severity * 0.3); // balance
-        patient.Pathology.Adjust(ConditionType.AirwayObstruction, seconds * severity * 0.3); // balance
-        patient.Physiology.Adjust(ParameterType.Stress, seconds * severity * 0.3); // balance
     }
 }

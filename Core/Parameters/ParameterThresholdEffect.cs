@@ -9,7 +9,7 @@ public sealed class HypoperfusionBrainDamageEffect : IParameterThresholdEffect
         double flowDeficit = Deficit(snapshot, ParameterType.CerebralBloodFlow);
         double oxygenDeficit = Deficit(snapshot, ParameterType.BloodOxygenLevel);
 
-        double damage = seconds * (flowDeficit * 0.015 + oxygenDeficit * 0.03); // balance
+        double damage = seconds * (flowDeficit * 0.017 + oxygenDeficit * 0.03); // balance
         if (damage <= 0) return;
 
         patient.Physiology.Adjust(ParameterType.BrainFunction, -damage);
