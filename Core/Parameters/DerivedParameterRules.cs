@@ -59,11 +59,6 @@ public sealed class CerebralBloodFlowRule : IDerivedParameterRule
         return globalFlowFactor * co2Factor * oxygenFactor * localFlowFactor * 100;
     }
 
-    // Мозъчна авторегулация: реалният мозък поддържа ПОЧТИ ПОСТОЯНЕН кръвоток
-    // в широк диапазон на перфузионно налягане (~50-150 mmHg) чрез активно
-    // свиване/разширяване на съдовете. Само извън тази граница
-    // авторегулацията се проваля и кръвотокът пада/расте линейно с
-    // налягането - точно там наистина трябва да е опасно, не преди това.
     private static double AutoregulationFactor(double cpp)
     {
         const double floor = 50;   // balance
@@ -86,13 +81,9 @@ public sealed class PeripheralOrganBloodFlowRule : IDerivedParameterRule
 {
     public ParameterType Type => ParameterType.PeripheralOrganBloodFlow;
 
-    // Аналогично на CerebralBloodFlow: глобален фактор от MAP (без ICP -
-    // периферните органи не са зад черепа) + пряк фактор от нивото на
-    // кислород (локална хипоксична вазоконстрикция) + локален фактор от
-    // сърдечна недостатъчност и автономната нервна система.
     public double Compute(IReadOnlyDictionary<ParameterType, double> snapshot, PathologicalState pathology)
     {
-        const double normalBpMmHg = 105; // balance, среда на 90-120
+        const double normalBpMmHg = 105; // balance
         
         double globalFlowFactor = Math.Clamp(snapshot[ParameterType.BloodPressure] / normalBpMmHg, 0, 1.3);
 

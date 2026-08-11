@@ -31,7 +31,7 @@ public sealed class ImpairedCerebralBloodFlowEffect : IConditionEffect
     {
         if (severity < 10)
         {
-            patient.Pathology.Adjust(ConditionType.ImpairedCerebralBloodFlow, seconds * 0.003); // balance
+            patient.Pathology.Adjust(ConditionType.ImpairedCerebralBloodFlow, seconds * 0.0015); // balance
         }
     }
 }

@@ -4,9 +4,6 @@ namespace OrganismSim.Core;
 
 public sealed class HypoperfusionBrainDamageEffect : IParameterThresholdEffect
 {
-    // Единен път за увреждане на мозъка - от недостатъчен кръвоток (инсулт,
-    // шок, сърдечна недостатъчност) И от недостатъчен кислород (задушаване,
-    // увреждане на бели дробове) - двата паралелни входа от diagram-а.
     public void ApplyTick(Patient patient, IReadOnlyDictionary<ParameterType, double> snapshot, int seconds)
     {
         double flowDeficit = Deficit(snapshot, ParameterType.CerebralBloodFlow);
@@ -28,9 +25,6 @@ public sealed class HypoperfusionBrainDamageEffect : IParameterThresholdEffect
 
 public sealed class ConsciousnessMetabolicEffect : IParameterThresholdEffect
 {
-    // Мозъкът е чувствителен и към две метаболитни отклонения, отделни от
-    // кръвотока/кислорода: кръвна захар и телесна температура извън
-    // нормата - и в двете посоки увреждат мозъчната функция.
     public void ApplyTick(Patient patient, IReadOnlyDictionary<ParameterType, double> snapshot, int seconds)
     {
         double damage = OutOfRangeSeverity(snapshot, ParameterType.BloodGlucoseLevel) * 0.02   // balance
@@ -54,10 +48,7 @@ public sealed class ConsciousnessMetabolicEffect : IParameterThresholdEffect
 
 public sealed class RespiratoryDriveEffect : IParameterThresholdEffect
 {
-    // Дихателният център е устойчив - потиска се едва при ТЕЖКА церебрална
-    // дисфункция, не при лека. Прагът затова не е NormalMin (80), а много
-    // по-нисък - около 30, представляващ близка до терминална увреда.
-    private const double SevereThreshold = 30; // balance
+    private const double SevereThreshold = 15; // balance
 
     public void ApplyTick(Patient patient, IReadOnlyDictionary<ParameterType, double> snapshot, int seconds)
     {
@@ -70,11 +61,6 @@ public sealed class RespiratoryDriveEffect : IParameterThresholdEffect
 
 public sealed class GasExchangeEffect : IParameterThresholdEffect
 {
-    // CO2 не прескача мигновено до ново равновесие - тялото има голям
-    // резервоар (кръв + тъкани, буферирани от бикарбонатната система),
-    // затова реалното ниво се движи ПОСТЕПЕННО към целта, не веднага.
-    // Кислородът остава derived (BloodOxygenLevelRule) - неговият резервоар
-    // е много по-малък и реално де-сатурира бързо, за разлика от CO2.
     private const double ApproachRatePerSecond = 0.03; // balance
 
     public void ApplyTick(Patient patient, IReadOnlyDictionary<ParameterType, double> snapshot, int seconds)
@@ -94,9 +80,6 @@ public sealed class GasExchangeEffect : IParameterThresholdEffect
         double lungInjury = patient.Pathology.GetSeverity(ConditionType.LungInjury);
         double pulmonaryEdema = patient.Pathology.GetSeverity(ConditionType.PulmonaryEdema);
 
-        // Десетократно по-малък принос от белодробна патология тук, отколкото
-        // при кислорода (виж BloodOxygenLevelRule) - CO2 дифундира много
-        // по-лесно през мембраната, затова увреждането ѝ бута основно O2.
         double exchangeEfficiency = 1
             - lungInjury / 10.0 * 0.15     // balance
             - pulmonaryEdema / 10.0 * 0.1; // balance
@@ -110,9 +93,6 @@ public sealed class GasExchangeEffect : IParameterThresholdEffect
 
 public sealed class HyperperfusionIcpEffect : IParameterThresholdEffect
 {
-    // Прекомерен мозъчен кръвоток повишава вътречерепното налягане - това
-    // намалява CPP (виж CerebralBloodFlowRule) и връща потока обратно
-    // надолу - самокоригиращ се кръг, не хардкоднат таван.
     public void ApplyTick(Patient patient, IReadOnlyDictionary<ParameterType, double> snapshot, int seconds)
     {
         var range = ParameterRange.All[ParameterType.CerebralBloodFlow];
@@ -137,14 +117,10 @@ public sealed class PainStressEffect : IParameterThresholdEffect
 
 public sealed class AutonomicReflexEffect : IParameterThresholdEffect
 {
-    private const double ApproachRatePerSecond = 0.05; // balance - колко бързо severity приближава целта
-    // Барорецепторен + хеморецепторен + метаболитен рефлекс, обединени в
-    // едно място, защото в diagram-а ~8 различни параметъра се събират в
-    // едни и същи 2 състояния (Sympathetic/Parasympathetic) - реалната
-    // физиология също минава през общ автономен път, не 8 независими стрелки.
+    private const double ApproachRatePerSecond = 0.05; // balance
     public void ApplyTick(Patient patient, IReadOnlyDictionary<ParameterType, double> snapshot, int seconds)
     {
-        double drive = 0; // положително -> симпатикус, отрицателно -> парасимпатикус
+        double drive = 0; // положително: симпатикус, отрицателно: парасимпатикус
 
         drive += LowDeficitRatio(snapshot, ParameterType.BloodPressure) * 0.3; // баро рефлекс
         drive += LowDeficitRatio(snapshot, ParameterType.BloodOxygenLevel) * 0.3; // хемо рефлекс
@@ -181,8 +157,6 @@ public sealed class AutonomicReflexEffect : IParameterThresholdEffect
 
 public sealed class PulmonaryCapillaryPressureTrigger : IParameterThresholdEffect
 {
-    // Високо капилярно налягане в белите дробове -> течност излиза в
-    // алвеолите -> задейства/задълбочава белодробен оток.
     public void ApplyTick(Patient patient, IReadOnlyDictionary<ParameterType, double> snapshot, int seconds)
     {
         var range = ParameterRange.All[ParameterType.PulmonaryCapillaryPressure];
@@ -195,9 +169,6 @@ public sealed class PulmonaryCapillaryPressureTrigger : IParameterThresholdEffec
 
 public sealed class OsmoticDehydrationTrigger : IParameterThresholdEffect
 {
-    // Висока кръвна захар (осмотична диуреза) и висока температура
-    // (изпотяване) водят до загуба на течности -> задейства/задълбочава
-    // обезводняване.
     public void ApplyTick(Patient patient, IReadOnlyDictionary<ParameterType, double> snapshot, int seconds)
     {
         var glucoseRange = ParameterRange.All[ParameterType.BloodGlucoseLevel];
