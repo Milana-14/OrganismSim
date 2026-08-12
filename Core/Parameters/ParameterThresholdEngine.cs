@@ -8,7 +8,7 @@ public sealed class ParameterThresholdEngine
         new ConsciousnessMetabolicEffect(),
         new RespiratoryDriveEffect(),
         new HyperperfusionIcpEffect(),
-        new PainStressEffect(),
+        new StressRegulationEffect(),
         new AutonomicReflexEffect(),
         new PulmonaryCapillaryPressureTrigger(),
         new OsmoticDehydrationTrigger(),

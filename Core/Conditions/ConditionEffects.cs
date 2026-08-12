@@ -53,7 +53,6 @@ public sealed class AirwayObstructionEffect : IConditionEffect
     public void ApplyTick(Patient patient, int seconds, double severity)
     {
         patient.Physiology.Adjust(ParameterType.RespiratoryRate, seconds * -severity * 0.2); // balance
-        patient.Physiology.Adjust(ParameterType.Stress, seconds * severity * 0.2); // balance
     }
 }
 
@@ -65,7 +64,6 @@ public sealed class LungInjuryEffect : IConditionEffect
     {
         patient.Physiology.Adjust(ParameterType.BloodOxygenLevel, seconds * -severity * 0.15); // balance
         patient.Physiology.Adjust(ParameterType.BloodCo2Level, seconds * severity * 0.15); // balance
-        patient.Physiology.Adjust(ParameterType.Stress, seconds * severity * 0.15); // balance
         patient.Physiology.Adjust(ParameterType.Pain, seconds * severity * 0.15); // balance
     }
 }
@@ -107,8 +105,6 @@ public sealed class ShockEffect : IConditionEffect
 
     public void ApplyTick(Patient patient, int seconds, double severity)
     {
-        patient.Physiology.Adjust(ParameterType.Stress, seconds * severity * 0.15); // balance
-
         var bpRange = ParameterRange.All[ParameterType.BloodPressure];
         bool decompensated = patient.Physiology.Get(ParameterType.BloodPressure) <= bpRange.LethalLow * 1.3; // balance - критично ниско въпреки компенсацията
 
@@ -125,7 +121,6 @@ public sealed class HypoglycemiaEffect : IConditionEffect
     public void ApplyTick(Patient patient, int seconds, double severity)
     {
         patient.Physiology.Adjust(ParameterType.BloodGlucoseLevel, seconds * -severity * 0.05); // balance
-        patient.Physiology.Adjust(ParameterType.Stress, seconds * severity * 0.02); // balance
     }
 }
 
@@ -158,11 +153,13 @@ public sealed class SeizureEffect : IConditionEffect
 public sealed class MildAllergicReactionEffect : IConditionEffect
 {
     public ConditionType Type => ConditionType.MildAllergicReaction;
+    private const double DecayPerSecond = 0.0025;
 
     public void ApplyTick(Patient patient, int seconds, double severity)
     {
-        patient.Physiology.Adjust(ParameterType.Stress, seconds * severity * 0.1); // balance
-        patient.Physiology.Adjust(ParameterType.Pain, seconds * severity * 0.1); // balance
+        patient.Physiology.Adjust(ParameterType.Pain, seconds * severity * 0.005); // balance
+
+        patient.Pathology.Adjust(ConditionType.MildAllergicReaction, seconds * -DecayPerSecond);
     }
 }
 
@@ -173,8 +170,7 @@ public sealed class AnaphylaxisEffect : IConditionEffect
     public void ApplyTick(Patient patient, int seconds, double severity)
     {
         patient.Physiology.Adjust(ParameterType.PeripheralVascularResistance, seconds * -severity * 0.3); // balance
-        patient.Pathology.Adjust(ConditionType.AirwayObstruction, seconds * severity * 0.3); // balance
-        patient.Physiology.Adjust(ParameterType.Stress, seconds * severity * 0.3); // balance
+        patient.Pathology.Adjust(ConditionType.AirwayObstruction, seconds * severity * 0.005); // balance
     }
 }
 
@@ -219,7 +215,6 @@ public sealed class IncreasedSympatheticActivityEffect : IConditionEffect
         patient.Physiology.Adjust(ParameterType.HeartRate, seconds * severity * 0.25); // balance
         patient.Physiology.Adjust(ParameterType.PeripheralVascularResistance, seconds * severity * 0.25); // balance
         patient.Physiology.Adjust(ParameterType.RespiratoryRate, seconds * severity * 0.08); // balance
-        patient.Physiology.Adjust(ParameterType.Stress, seconds * severity * 0.25); // balance
     }
 }
 
@@ -232,6 +227,5 @@ public sealed class IncreasedParasympatheticActivityEffect : IConditionEffect
         patient.Physiology.Adjust(ParameterType.HeartRate, seconds * -severity * 0.25); // balance
         patient.Physiology.Adjust(ParameterType.PeripheralVascularResistance, seconds * -severity * 0.25); // balance
         patient.Physiology.Adjust(ParameterType.RespiratoryRate, seconds * -severity * 0.1); // balance
-        patient.Physiology.Adjust(ParameterType.Stress, seconds * -severity * 0.25); // balance
     }
 }

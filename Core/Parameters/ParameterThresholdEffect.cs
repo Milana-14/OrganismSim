@@ -76,6 +76,7 @@ public sealed class GasExchangeEffect : IParameterThresholdEffect
         const double referenceRate = 16; // balance
         const double referenceCo2 = 40;  // balance
         const double minRate = 1;
+        const double maxTargetCo2 = 100; // balance
 
         double lungInjury = patient.Pathology.GetSeverity(ConditionType.LungInjury);
         double pulmonaryEdema = patient.Pathology.GetSeverity(ConditionType.PulmonaryEdema);
@@ -87,7 +88,7 @@ public sealed class GasExchangeEffect : IParameterThresholdEffect
 
         double effectiveRate = Math.Max(minRate, snapshot[ParameterType.RespiratoryRate] * exchangeEfficiency);
 
-        return referenceCo2 * referenceRate / effectiveRate;
+        return Math.Min(maxTargetCo2, referenceCo2 * referenceRate / effectiveRate);
     }
 }
 
@@ -103,15 +104,36 @@ public sealed class HyperperfusionIcpEffect : IParameterThresholdEffect
     }
 }
 
-public sealed class PainStressEffect : IParameterThresholdEffect
+public sealed class StressRegulationEffect : IParameterThresholdEffect
 {
+    private const double ApproachRatePerSecond = 0.05; // balance
+
     public void ApplyTick(Patient patient, IReadOnlyDictionary<ParameterType, double> snapshot, int seconds)
     {
-        var range = ParameterRange.All[ParameterType.Pain];
-        double excess = Math.Max(0, snapshot[ParameterType.Pain] - range.NormalMax);
-        if (excess <= 0) return;
+        double target = ComputeTarget(patient, snapshot);
+        double current = snapshot[ParameterType.Stress];
 
-        patient.Physiology.Adjust(ParameterType.Stress, seconds * excess * 0.3); // balance
+        patient.Physiology.Adjust(ParameterType.Stress, (target - current) * ApproachRatePerSecond * seconds);
+    }
+
+    private static double ComputeTarget(Patient patient, IReadOnlyDictionary<ParameterType, double> snapshot)
+    {
+        const double baseline = 1; // balance
+        double target = baseline;
+
+        target += patient.Pathology.GetSeverity(ConditionType.AirwayObstruction) * 0.2; // balance
+        target += patient.Pathology.GetSeverity(ConditionType.LungInjury) * 0.15; // balance
+        target += patient.Pathology.GetSeverity(ConditionType.Shock) * 0.15; // balance
+        target += patient.Pathology.GetSeverity(ConditionType.Hypoglycemia) * 0.1; // balance
+        target += patient.Pathology.GetSeverity(ConditionType.Anaphylaxis) * 0.3; // balance
+        target += patient.Pathology.GetSeverity(ConditionType.MildAllergicReaction) * 0.1; // balance
+        target += patient.Pathology.GetSeverity(ConditionType.IncreasedSympatheticActivity) * 0.25; // balance
+        target -= patient.Pathology.GetSeverity(ConditionType.IncreasedParasympatheticActivity) * 0.25; // balance
+
+        double painExcess = Math.Max(0, snapshot[ParameterType.Pain] - ParameterRange.All[ParameterType.Pain].NormalMax);
+        target += painExcess * 0.3; // balance
+
+        return Math.Clamp(target, 0, 10);
     }
 }
 
