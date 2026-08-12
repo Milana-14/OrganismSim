@@ -52,7 +52,7 @@ public sealed class AirwayObstructionEffect : IConditionEffect
 
     public void ApplyTick(Patient patient, int seconds, double severity)
     {
-        patient.Physiology.Adjust(ParameterType.RespiratoryRate, seconds * -severity * 0.2); // balance
+        patient.Physiology.Adjust(ParameterType.Stress, seconds * -severity * 0.2); // balance
     }
 }
 
@@ -169,8 +169,8 @@ public sealed class AnaphylaxisEffect : IConditionEffect
 
     public void ApplyTick(Patient patient, int seconds, double severity)
     {
-        patient.Physiology.Adjust(ParameterType.PeripheralVascularResistance, seconds * -severity * 0.3); // balance
-        patient.Pathology.Adjust(ConditionType.AirwayObstruction, seconds * severity * 0.005); // balance
+        patient.Physiology.Adjust(ParameterType.PeripheralVascularResistance, seconds * -severity * 0.1); // balance
+        patient.Pathology.Adjust(ConditionType.AirwayObstruction, seconds * severity * 0.0018); // balance
     }
 }
 

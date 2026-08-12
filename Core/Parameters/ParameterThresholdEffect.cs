@@ -205,3 +205,21 @@ public sealed class OsmoticDehydrationTrigger : IParameterThresholdEffect
         patient.Pathology.Adjust(ConditionType.Dehydration, delta);
     }
 }
+
+public sealed class AirwayObstructionCapEffect : IParameterThresholdEffect
+{
+    public void ApplyTick(Patient patient, IReadOnlyDictionary<ParameterType, double> snapshot, int seconds)
+    {
+        double severity = patient.Pathology.GetSeverity(ConditionType.AirwayObstruction);
+        if (severity <= 0) return;
+
+        var range = ParameterRange.All[ParameterType.RespiratoryRate];
+        double maxAchievableRate = range.NormalMax * (1 - severity / 10.0);
+        double current = patient.Physiology.Get(ParameterType.RespiratoryRate);
+
+        if (current > maxAchievableRate)
+        {
+            patient.Physiology.Set(ParameterType.RespiratoryRate, maxAchievableRate);
+        }
+    }
+}

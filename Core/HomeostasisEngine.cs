@@ -25,6 +25,7 @@ public sealed class HomeostasisEngine
     {
         if (type == ParameterType.IntracranialPressure) return 0.05; // balance
         if (type == ParameterType.BloodVolume) return 0.005; // balance
+        if (type == ParameterType.BloodCo2Level) return 0.003; // balance
         return 0.01;
     }
 }

@@ -8,11 +8,12 @@ public sealed class ParameterThresholdEngine
         new ConsciousnessMetabolicEffect(),
         new RespiratoryDriveEffect(),
         new HyperperfusionIcpEffect(),
-        new StressRegulationEffect(),
         new AutonomicReflexEffect(),
         new PulmonaryCapillaryPressureTrigger(),
         new OsmoticDehydrationTrigger(),
         new GasExchangeEffect(),
+        new StressRegulationEffect(),
+        new AirwayObstructionCapEffect(),
     };
 
     public void ApplyTick(Patient patient, IReadOnlyDictionary<ParameterType, double> snapshot, int seconds)
