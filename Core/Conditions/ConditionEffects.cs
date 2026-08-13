@@ -166,12 +166,22 @@ public sealed class MildAllergicReactionEffect : IConditionEffect
 public sealed class AnaphylaxisEffect : IConditionEffect
 {
     public ConditionType Type => ConditionType.Anaphylaxis;
-
+    
     public void ApplyTick(Patient patient, int seconds, double severity)
     {
-        patient.Physiology.Adjust(ParameterType.PeripheralVascularResistance, seconds * -severity * 0.1); // balance
-        patient.Pathology.Adjust(ConditionType.AirwayObstruction, seconds * severity * 0.0018); // balance
+        var (airwayFactor, vascularFactor) = GetPhenotypeFactors(patient.AnaphylaxisPhenotype ?? AnaphylaxisPhenotype.Balanced);
+
+        patient.Physiology.Adjust(ParameterType.PeripheralVascularResistance, seconds * -severity * 0.1 * vascularFactor); // balance
+        patient.Pathology.Adjust(ConditionType.AirwayObstruction, seconds * severity * 0.0018 * airwayFactor); // balance
+        patient.Physiology.Adjust(ParameterType.Stress, seconds * severity * 0.2); // balance
     }
+
+    private static (double airway, double vascular) GetPhenotypeFactors(AnaphylaxisPhenotype phenotype) => phenotype switch
+    {
+        AnaphylaxisPhenotype.RespiratoryDominant => (1.4, 0.6),
+        AnaphylaxisPhenotype.CardiovascularDominant => (0.6, 1.2),
+        _ => (1.0, 1.0)
+    };
 }
 
 public sealed class HypothermiaEffect : IConditionEffect
