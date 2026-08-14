@@ -27,21 +27,31 @@ public sealed class ConsciousnessMetabolicEffect : IParameterThresholdEffect
 {
     public void ApplyTick(Patient patient, IReadOnlyDictionary<ParameterType, double> snapshot, int seconds)
     {
-        double damage = OutOfRangeSeverity(snapshot, ParameterType.BloodGlucoseLevel) * 0.02   // balance
-                      + OutOfRangeSeverity(snapshot, ParameterType.BodyTemperature) * 0.3;      // balance
+        double damage = GlucoseDamage(snapshot) + TemperatureDamage(snapshot);
         if (damage <= 0) return;
 
         double delta = seconds * damage;
-        patient.Physiology.Adjust(ParameterType.BrainFunction, -delta * 0.7); // balance
-        patient.Physiology.Adjust(ParameterType.Consciousness, -delta); // balance
+        patient.Physiology.Adjust(ParameterType.BrainFunction, -delta * 0.7);
+        patient.Physiology.Adjust(ParameterType.Consciousness, -delta);
     }
 
-    private static double OutOfRangeSeverity(IReadOnlyDictionary<ParameterType, double> snapshot, ParameterType type)
+    private static double GlucoseDamage(IReadOnlyDictionary<ParameterType, double> snapshot)
     {
-        var range = ParameterRange.All[type];
-        double value = snapshot[type];
-        if (value < range.NormalMin) return range.NormalMin - value;
-        if (value > range.NormalMax) return value - range.NormalMax;
+        var range = ParameterRange.All[ParameterType.BloodGlucoseLevel];
+        double value = snapshot[ParameterType.BloodGlucoseLevel];
+
+        if (value < range.NormalMin) return (range.NormalMin - value) * 0.02; // balance
+        if (value > range.NormalMax) return (value - range.NormalMax) * 0.002; // balance
+        return 0;
+    }
+
+    private static double TemperatureDamage(IReadOnlyDictionary<ParameterType, double> snapshot)
+    {
+        var range = ParameterRange.All[ParameterType.BodyTemperature];
+        double value = snapshot[ParameterType.BodyTemperature];
+        
+        if (value < range.NormalMin) return (range.NormalMin - value) * 0.3; // balance
+        if (value > range.NormalMax) return (value - range.NormalMax) * 0.3; // balance
         return 0;
     }
 }
@@ -199,7 +209,7 @@ public sealed class OsmoticDehydrationTrigger : IParameterThresholdEffect
         double glucoseExcess = Math.Max(0, snapshot[ParameterType.BloodGlucoseLevel] - glucoseRange.NormalMax);
         double tempExcess = Math.Max(0, snapshot[ParameterType.BodyTemperature] - tempRange.NormalMax);
 
-        double delta = seconds * (glucoseExcess * 0.002 + tempExcess * 0.05); // balance
+        double delta = seconds * (glucoseExcess * 0.0004 + tempExcess * 0.05); // balance
         if (delta <= 0) return;
 
         patient.Pathology.Adjust(ConditionType.Dehydration, delta);

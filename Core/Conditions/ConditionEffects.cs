@@ -130,7 +130,12 @@ public sealed class HyperglycemiaEffect : IConditionEffect
 
     public void ApplyTick(Patient patient, int seconds, double severity)
     {
-        patient.Physiology.Adjust(ParameterType.BloodGlucoseLevel, seconds * severity * 0.05); // balance
+        if (severity < 10)
+        {
+            patient.Pathology.Adjust(ConditionType.Hyperglycemia, seconds * 0.004); // balance
+        }
+        
+        patient.Physiology.Adjust(ParameterType.BloodGlucoseLevel, seconds * severity * 0.09); // balance
     }
 }
 
