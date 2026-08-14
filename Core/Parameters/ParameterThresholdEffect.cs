@@ -209,7 +209,7 @@ public sealed class OsmoticDehydrationTrigger : IParameterThresholdEffect
         double glucoseExcess = Math.Max(0, snapshot[ParameterType.BloodGlucoseLevel] - glucoseRange.NormalMax);
         double tempExcess = Math.Max(0, snapshot[ParameterType.BodyTemperature] - tempRange.NormalMax);
 
-        double delta = seconds * (glucoseExcess * 0.0004 + tempExcess * 0.05); // balance
+        double delta = seconds * (glucoseExcess * 0.00003 + tempExcess * 0.002); // balance
         if (delta <= 0) return;
 
         patient.Pathology.Adjust(ConditionType.Dehydration, delta);

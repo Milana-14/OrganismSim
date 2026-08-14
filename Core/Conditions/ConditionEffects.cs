@@ -135,7 +135,7 @@ public sealed class HyperglycemiaEffect : IConditionEffect
             patient.Pathology.Adjust(ConditionType.Hyperglycemia, seconds * 0.004); // balance
         }
         
-        patient.Physiology.Adjust(ParameterType.BloodGlucoseLevel, seconds * severity * 0.09); // balance
+        patient.Physiology.Adjust(ParameterType.BloodGlucoseLevel, seconds * severity * 0.4); // balance
     }
 }
 
@@ -215,7 +215,7 @@ public sealed class DehydrationEffect : IConditionEffect
 
     public void ApplyTick(Patient patient, int seconds, double severity)
     {
-        patient.Physiology.Adjust(ParameterType.BloodVolume, seconds * -severity * 0.04); // balance
+        patient.Physiology.Adjust(ParameterType.BloodVolume, seconds * -severity * 0.05); // balance
     }
 }
 
