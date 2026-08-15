@@ -41,7 +41,15 @@ public sealed class ConsciousnessMetabolicEffect : IParameterThresholdEffect
         double value = snapshot[ParameterType.BloodGlucoseLevel];
 
         if (value < range.NormalMin) return (range.NormalMin - value) * 0.02; // balance
-        if (value > range.NormalMax) return (value - range.NormalMax) * 0.002; // balance
+
+        if (value > range.NormalMax)
+        {
+            double excess = value - range.NormalMax;
+            double lethalSpan = range.LethalHigh - range.NormalMax;
+            double normalized = excess / lethalSpan;
+            return normalized * normalized * 0.7; // balance
+        }
+
         return 0;
     }
 
@@ -209,7 +217,7 @@ public sealed class OsmoticDehydrationTrigger : IParameterThresholdEffect
         double glucoseExcess = Math.Max(0, snapshot[ParameterType.BloodGlucoseLevel] - glucoseRange.NormalMax);
         double tempExcess = Math.Max(0, snapshot[ParameterType.BodyTemperature] - tempRange.NormalMax);
 
-        double delta = seconds * (glucoseExcess * 0.00003 + tempExcess * 0.002); // balance
+        double delta = seconds * (glucoseExcess * 0.00002 + tempExcess * 0.002); // balance
         if (delta <= 0) return;
 
         patient.Pathology.Adjust(ConditionType.Dehydration, delta);

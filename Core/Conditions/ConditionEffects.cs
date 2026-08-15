@@ -106,7 +106,7 @@ public sealed class ShockEffect : IConditionEffect
     public void ApplyTick(Patient patient, int seconds, double severity)
     {
         var bpRange = ParameterRange.All[ParameterType.BloodPressure];
-        bool decompensated = patient.Physiology.Get(ParameterType.BloodPressure) <= bpRange.LethalLow * 1.3; // balance - критично ниско въпреки компенсацията
+        bool decompensated = patient.Physiology.Get(ParameterType.BloodPressure) <= bpRange.LethalLow * 1.3; // balance
 
         double direction = decompensated ? -1 : 1;
         patient.Physiology.Adjust(ParameterType.HeartRate, seconds * direction * severity * 0.15); // balance
@@ -135,7 +135,7 @@ public sealed class HyperglycemiaEffect : IConditionEffect
             patient.Pathology.Adjust(ConditionType.Hyperglycemia, seconds * 0.004); // balance
         }
         
-        patient.Physiology.Adjust(ParameterType.BloodGlucoseLevel, seconds * severity * 0.4); // balance
+        patient.Physiology.Adjust(ParameterType.BloodGlucoseLevel, seconds * severity * 0.52); // balance
     }
 }
 
@@ -215,7 +215,7 @@ public sealed class DehydrationEffect : IConditionEffect
 
     public void ApplyTick(Patient patient, int seconds, double severity)
     {
-        patient.Physiology.Adjust(ParameterType.BloodVolume, seconds * -severity * 0.05); // balance
+        patient.Physiology.Adjust(ParameterType.BloodVolume, seconds * -severity * 0.051); // balance
     }
 }
 
