@@ -1,3 +1,4 @@
+using System.ComponentModel.Design;
 using System.Security.Cryptography;
 
 namespace OrganismSim.Core;
@@ -9,17 +10,39 @@ public sealed class ExternalBleedingEffect : IConditionEffect
     public void ApplyTick(Patient patient, int seconds, double severity)
     {
         patient.Physiology.Adjust(ParameterType.BloodVolume, seconds * -severity * 0.042); // balance
+        
+        if (patient.ExternalBleedingType == ExternalBleedingType.Arterial)
+        {
+            
+        }
+        else if (patient.ExternalBleedingType == ExternalBleedingType.Venous)
+        {
+            
+        }
     }
 }
 
-public sealed class HemothoraxEffect : IConditionEffect
+public sealed class InternalBleedingEffect : IConditionEffect
 {
-    public ConditionType Type => ConditionType.Hemothorax;
+    public ConditionType Type => ConditionType.InternalBleeding;
 
     public void ApplyTick(Patient patient, int seconds, double severity)
     {
-        patient.Physiology.Adjust(ParameterType.BloodVolume, seconds * -severity * 0.25); // balance
-        patient.Physiology.Adjust(ParameterType.PleuralBloodVolume, seconds * severity * 0.02); // balance
+        if (patient.InternalBleedingType == InternalBleedingType.Hemothorax)
+        {
+            patient.Physiology.Adjust(ParameterType.BloodVolume, seconds * -severity * 0.25); // balance
+            patient.Physiology.Adjust(ParameterType.PleuralBloodVolume, seconds * severity * 0.02); // balance
+        }
+        else if (patient.InternalBleedingType == InternalBleedingType.IntraAbdominal)
+        {
+            patient.Physiology.Adjust(ParameterType.BloodVolume, seconds * -severity * 0.3); // balance
+            // else
+        }
+        else if (patient.InternalBleedingType == InternalBleedingType.PericardialTamponade)
+        {
+            patient.Physiology.Adjust(ParameterType.BloodVolume, seconds * -severity * 0.15); // balance
+            // else
+        }
     }
 }
 
@@ -178,7 +201,7 @@ public sealed class AnaphylaxisEffect : IConditionEffect
 
         patient.Physiology.Adjust(ParameterType.PeripheralVascularResistance, seconds * -severity * 0.1 * vascularFactor); // balance
         patient.Pathology.Adjust(ConditionType.AirwayObstruction, seconds * severity * 0.0018 * airwayFactor); // balance
-        patient.Physiology.Adjust(ParameterType.Stress, seconds * severity * 0.2); // balance
+        patient.Pathology.Adjust(ConditionType.Anaphylaxis, seconds * 0.003); // balance
     }
 
     private static (double airway, double vascular) GetPhenotypeFactors(AnaphylaxisPhenotype phenotype) => phenotype switch
@@ -195,7 +218,14 @@ public sealed class HypothermiaEffect : IConditionEffect
 
     public void ApplyTick(Patient patient, int seconds, double severity)
     {
-        patient.Physiology.Adjust(ParameterType.BodyTemperature, seconds * -severity * 0.1); // balance
+        patient.Physiology.Adjust(ParameterType.BodyTemperature, seconds * -severity * 0.004); // balance
+
+        double bodyTemp = patient.Physiology.Get(ParameterType.BodyTemperature);
+        if (bodyTemp < 32.0)
+        {
+            double coldDeficit = 32.0 - bodyTemp;
+            patient.Physiology.Adjust(ParameterType.HeartRate, -seconds * coldDeficit * 0.6); // balance
+        }
     }
 }
 

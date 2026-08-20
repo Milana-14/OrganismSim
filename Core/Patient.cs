@@ -14,8 +14,12 @@ public class Patient
     private readonly SymptomEngine _symptomEngine = new();
     private readonly HomeostasisEngine _homeostasisEngine = new();
     public PatientPosture Posture { get; set; } = PatientPosture.Supine;
+    
+    public ExternalBleedingType? ExternalBleedingType  { get; set; }
+    public InternalBleedingType? InternalBleedingType  { get; set; }
     public HeartFailureType? HeartFailureType { get; set; }
     public AnaphylaxisPhenotype? AnaphylaxisPhenotype { get; set; }
+    
     public bool IsAlive { get; private set; } = true;
     public DeathCause CauseOfDeath { get; private set; } = DeathCause.None;
     public HashSet<SymptomType> ActiveSymptoms { get; private set; } = new();

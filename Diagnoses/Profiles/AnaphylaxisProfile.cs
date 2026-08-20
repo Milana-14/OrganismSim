@@ -10,6 +10,6 @@ public class AnaphylaxisProfile : IDiagnosisProfile
     public void Initialize(Patient patient)
     {
         patient.Pathology.SetSeverity(ConditionType.Anaphylaxis, 7);
-        patient.AnaphylaxisPhenotype = (Core.AnaphylaxisPhenotype)RandomNumberGenerator.GetInt32(Enum.GetValues<AnaphylaxisPhenotype>().Length);
+        patient.AnaphylaxisPhenotype = (AnaphylaxisPhenotype)RandomNumberGenerator.GetInt32(Enum.GetValues<AnaphylaxisPhenotype>().Length);
     }
 }

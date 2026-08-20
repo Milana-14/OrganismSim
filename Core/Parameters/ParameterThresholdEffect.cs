@@ -23,6 +23,29 @@ public sealed class HypoperfusionBrainDamageEffect : IParameterThresholdEffect
     }
 }
 
+public sealed class SystemicHypoperfusionEffect : IParameterThresholdEffect
+{
+    private const double MaxContribution = 40; // balance
+    public void ApplyTick(Patient patient, IReadOnlyDictionary<ParameterType, double> snapshot, int seconds)
+    {
+        double bpDeficitRatio = LowDeficitRatio(snapshot, ParameterType.BloodPressure);
+        double damage = seconds * bpDeficitRatio * 0.15; // balance
+
+        double consciousness = patient.Physiology.Get(ParameterType.Consciousness);
+        if (consciousness - damage < ParameterRange.All[ParameterType.Consciousness].NormalMax - MaxContribution) return;
+
+        patient.Physiology.Adjust(ParameterType.Consciousness, -damage);
+        patient.Physiology.Adjust(ParameterType.BrainFunction, -damage * 0.7);
+    }
+
+    public double LowDeficitRatio(IReadOnlyDictionary<ParameterType, double> snapshot, ParameterType type)
+    {
+        var range = ParameterRange.All[type];
+        double width = Math.Max(1, range.NormalMax - range.NormalMin);
+        return Math.Max(0, (range.NormalMin - snapshot[type]) / width);
+    }
+}
+
 public sealed class ConsciousnessMetabolicEffect : IParameterThresholdEffect
 {
     public void ApplyTick(Patient patient, IReadOnlyDictionary<ParameterType, double> snapshot, int seconds)
@@ -58,7 +81,16 @@ public sealed class ConsciousnessMetabolicEffect : IParameterThresholdEffect
         var range = ParameterRange.All[ParameterType.BodyTemperature];
         double value = snapshot[ParameterType.BodyTemperature];
         
-        if (value < range.NormalMin) return (range.NormalMin - value) * 0.3; // balance
+        const double consciousFloorC = 32.0; // balance
+        if (value < consciousFloorC)
+        {
+            double deficit = consciousFloorC - value;
+            double span = consciousFloorC - range.LethalLow; // balance
+            double normalized = Math.Clamp(deficit / span, 0, 1);
+            return normalized * normalized * 0.9; // balance
+        }
+        
+        
         if (value > range.NormalMax) return (value - range.NormalMax) * 0.3; // balance
         return 0;
     }
@@ -98,11 +130,17 @@ public sealed class GasExchangeEffect : IParameterThresholdEffect
 
         double lungInjury = patient.Pathology.GetSeverity(ConditionType.LungInjury);
         double pulmonaryEdema = patient.Pathology.GetSeverity(ConditionType.PulmonaryEdema);
+        
+        double pleuralBlood = snapshot[ParameterType.PleuralBloodVolume];
+        ParameterRange pleuralRange = ParameterRange.All[ParameterType.PleuralBloodVolume];
+        double pleuralRatio = pleuralBlood / Math.Max(1, pleuralRange.LethalHigh);
 
         double exchangeEfficiency = 1
-            - lungInjury / 10.0 * 0.15     // balance
-            - pulmonaryEdema / 10.0 * 0.1; // balance
-        exchangeEfficiency = Math.Clamp(exchangeEfficiency, 0.3, 1);
+            - lungInjury / 10.0 * 0.15 // balance
+            - pulmonaryEdema / 10.0 * 0.1 // balance
+            - pleuralRatio * 0.5; // balance
+        
+        exchangeEfficiency = Math.Clamp(exchangeEfficiency, 0.15, 1);
 
         double effectiveRate = Math.Max(minRate, snapshot[ParameterType.RespiratoryRate] * exchangeEfficiency);
 
@@ -136,22 +174,59 @@ public sealed class StressRegulationEffect : IParameterThresholdEffect
 
     private static double ComputeTarget(Patient patient, IReadOnlyDictionary<ParameterType, double> snapshot)
     {
-        const double baseline = 1; // balance
-        double target = baseline;
-
-        target += patient.Pathology.GetSeverity(ConditionType.AirwayObstruction) * 0.2; // balance
-        target += patient.Pathology.GetSeverity(ConditionType.LungInjury) * 0.15; // balance
-        target += patient.Pathology.GetSeverity(ConditionType.Shock) * 0.15; // balance
-        target += patient.Pathology.GetSeverity(ConditionType.Hypoglycemia) * 0.1; // balance
-        target += patient.Pathology.GetSeverity(ConditionType.Anaphylaxis) * 0.3; // balance
-        target += patient.Pathology.GetSeverity(ConditionType.MildAllergicReaction) * 0.1; // balance
-        target += patient.Pathology.GetSeverity(ConditionType.IncreasedSympatheticActivity) * 0.25; // balance
-        target -= patient.Pathology.GetSeverity(ConditionType.IncreasedParasympatheticActivity) * 0.25; // balance
-
-        double painExcess = Math.Max(0, snapshot[ParameterType.Pain] - ParameterRange.All[ParameterType.Pain].NormalMax);
-        target += painExcess * 0.3; // balance
-
+        double target = 1 + PathologyLoad(patient);
+        target += patient.Pathology.GetSeverity(ConditionType.IncreasedSympatheticActivity) * 0.25;
+        target -= patient.Pathology.GetSeverity(ConditionType.IncreasedParasympatheticActivity) * 0.25;
+        target -= patient.Physiology.Get(ParameterType.Comfort) * 0.4;
+        target += Math.Max(0, snapshot[ParameterType.Pain] - ParameterRange.All[ParameterType.Pain].NormalMax) * 0.3;
         return Math.Clamp(target, 0, 10);
+    }
+    
+    private static readonly IReadOnlyDictionary<ConditionType, double> StressWeights = new Dictionary<ConditionType, double>
+    {
+        [ConditionType.ExternalBleeding] = 0.25,        // видимата кръв - силен психологически тригер
+        [ConditionType.InternalBleeding] = 0.12,        // невидимо за пациента, само слабост
+        [ConditionType.IntracranialProcess] = 0.15,
+        [ConditionType.AirwayObstruction] = 0.35,       // "не мога да дишам" - най-паникьосващото усещане, което съществува
+        [ConditionType.LungInjury] = 0.2,
+        [ConditionType.PulmonaryEdema] = 0.25,          // усещане за давене
+        [ConditionType.HeartFailure] = 0.2,
+        [ConditionType.ImpairedCerebralBloodFlow] = 0.1, // объркването намалява способността да усеща страх
+        [ConditionType.Shock] = 0.2,
+        [ConditionType.Hypoglycemia] = 0.15,            // адренергичните симптоми са част от картината
+        [ConditionType.Hyperglycemia] = 0.05,           // бавно, малко остра тревога
+        [ConditionType.Dehydration] = 0.05,
+        [ConditionType.Seizure] = 0.1,                  // само по себе си самозатихва
+        [ConditionType.Hypothermia] = 0.1,
+        [ConditionType.Hyperthermia] = 0.1,
+        [ConditionType.MildAllergicReaction] = 0.05,
+        [ConditionType.Anaphylaxis] = 0.8,              // вече обосновано с Pumphrey "impending doom"
+        [ConditionType.Fracture111] = 0.05,             // основното при фрактура минава през Pain, не тук — затова ниско
+    };
+
+    public static double PathologyLoad(Patient patient)
+    {
+        double load = 0;
+        foreach (var (type, weight) in StressWeights)
+            load += patient.Pathology.GetSeverity(type) * weight;
+        return load;
+    }
+}
+
+public sealed class ComfortDecayEffect : IParameterThresholdEffect
+{
+    private const double DecayRate = 0.02;
+    
+    public void ApplyTick(Patient patient, IReadOnlyDictionary<ParameterType, double> snapshot, int seconds)
+    {
+        double load = StressRegulationEffect.PathologyLoad(patient);
+        if (load <= 0) return;
+
+        double current = snapshot[ParameterType.Comfort];
+        if (current <= 0) return;
+
+        double delta = load * DecayRate * seconds;
+        patient.Physiology.Adjust(ParameterType.Comfort, -Math.Min(current, delta));
     }
 }
 
@@ -165,7 +240,10 @@ public sealed class AutonomicReflexEffect : IParameterThresholdEffect
         drive += LowDeficitRatio(snapshot, ParameterType.BloodPressure) * 0.3; // баро рефлекс
         drive += LowDeficitRatio(snapshot, ParameterType.BloodOxygenLevel) * 0.3; // хемо рефлекс
         drive += LowDeficitRatio(snapshot, ParameterType.BloodGlucoseLevel) * 0.2; // адренергичен отговор
-        drive += LowDeficitRatio(snapshot, ParameterType.BodyTemperature) * 0.15; // треперене
+        drive += (snapshot[ParameterType.BodyTemperature] >= 30.0 
+            ? LowDeficitRatio(snapshot, ParameterType.BodyTemperature) 
+            : 0) * 0.15; // треперене до 30 градуса
+        drive += HighExcessRatio(snapshot, ParameterType.Stress) * 0.05; // balance
         drive -= HighExcessRatio(snapshot, ParameterType.BloodPressure) * 0.3; // високо кръвно потиска симпатикус
 
         double targetSympathetic = Math.Clamp(drive, 0, 1) * 10; // balance

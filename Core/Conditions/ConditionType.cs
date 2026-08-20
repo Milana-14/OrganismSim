@@ -3,7 +3,7 @@ namespace OrganismSim.Core;
 public enum ConditionType
 {
     ExternalBleeding,           // външно кървене
-    Hemothorax,                 // вътрешно кървене в гръдния кош (хемоторакс)
+    InternalBleeding,           // вътрешно кървене
     IntracranialProcess,        // вътречерепен процес
     AirwayObstruction,          // запушване на дихателните пътища
     LungInjury,                 // увреждане на белите дробове

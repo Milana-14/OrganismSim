@@ -5,9 +5,11 @@ public sealed class ParameterThresholdEngine
     private readonly List<IParameterThresholdEffect> _effects = new()
     {
         new HypoperfusionBrainDamageEffect(),
+        new SystemicHypoperfusionEffect(),
         new ConsciousnessMetabolicEffect(),
         new RespiratoryDriveEffect(),
         new HyperperfusionIcpEffect(),
+        new ComfortDecayEffect(),
         new AutonomicReflexEffect(),
         new PulmonaryCapillaryPressureTrigger(),
         new OsmoticDehydrationTrigger(),

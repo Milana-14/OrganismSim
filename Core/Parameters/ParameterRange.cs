@@ -62,17 +62,20 @@ public sealed class ParameterRange
 
         // телесна температура, градус целзий
         [ParameterType.BodyTemperature] = new ParameterRange(min: 20, max: 45, normalMin: 36.1, normalMax: 37.2, lethalLow: 28, lethalHigh: 42),
+        
+        // ниво на съзнание, условна скала 0-100 (не пряко летален, 0 - кома)
+        [ParameterType.Consciousness] = new ParameterRange(min: 0, max: 100, normalMin: 80, normalMax: 100, lethalLow: double.MinValue, lethalHigh: double.MaxValue),
 
+        // мозъчна функция, условна скала 0-100
+        [ParameterType.BrainFunction] = new ParameterRange(min: 0, max: 100, normalMin: 80, normalMax: 100, lethalLow: 15, lethalHigh: double.MaxValue),
+        
         // ниво на стрес, условна скала 0-10 (не пряко летален)
         [ParameterType.Stress] = new ParameterRange(min: 0, max: 10, normalMin: 0, normalMax: 2, lethalLow: double.MinValue, lethalHigh: double.MaxValue),
 
         // ниво на болка, условна скала 0-10 (не пряко летален)
         [ParameterType.Pain] = new ParameterRange(min: 0, max: 10, normalMin: 0, normalMax: 1, lethalLow: double.MinValue, lethalHigh: double.MaxValue),
 
-        // ниво на съзнание, условна скала 0-100 (не пряко летален, 0 - кома)
-        [ParameterType.Consciousness] = new ParameterRange(min: 0, max: 100, normalMin: 80, normalMax: 100, lethalLow: double.MinValue, lethalHigh: double.MaxValue),
-
-        // мозъчна функция, условна скала 0-100
-        [ParameterType.BrainFunction] = new ParameterRange(min: 0, max: 100, normalMin: 80, normalMax: 100, lethalLow: 15, lethalHigh: double.MaxValue),
+        // комфорт
+        [ParameterType.Comfort] = new ParameterRange(min: 0, max: 10, normalMin: 0, normalMax: 0, lethalLow: double.MinValue, lethalHigh: double.MaxValue),
     };
 }

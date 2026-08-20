@@ -2,7 +2,8 @@ namespace OrganismSim.Diagnoses;
 
 public enum DiagnosisType
 {
-    Bleeding,
+    ExternalBleeding,
+    InternalBleeding,
     MyocardialInfarction,
     Stroke,
     Hypoglycemia,

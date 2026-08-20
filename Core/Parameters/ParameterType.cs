@@ -16,8 +16,9 @@ public enum ParameterType
     PulmonaryCapillaryPressure,     // налягане в белодробните капиляри
     BloodGlucoseLevel,              // ниво на кръвната захар
     BodyTemperature,                // телесна температура
-    Stress,                         // стрес
-    Pain,                           // болка
     Consciousness,                  // съзнание (0 - кома)
     BrainFunction,                  // мозъчна функция
+    Stress,                         // стрес
+    Pain,                           // болка
+    Comfort,                        // комфорт
 }

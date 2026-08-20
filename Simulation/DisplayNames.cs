@@ -39,16 +39,17 @@ public static readonly Dictionary<ParameterType, string> Parameters = new()
     [ParameterType.PulmonaryCapillaryPressure] = "Налягане в белодробните капиляри",
     [ParameterType.BloodGlucoseLevel] = "Ниво на кръвната захар",
     [ParameterType.BodyTemperature] = "Телесна температура",
-    [ParameterType.Stress] = "Стрес",
-    [ParameterType.Pain] = "Болка",
     [ParameterType.Consciousness] = "Съзнание",
     [ParameterType.BrainFunction] = "Мозъчна функция",
+    [ParameterType.Stress] = "Стрес",
+    [ParameterType.Pain] = "Болка",
+    [ParameterType.Comfort] = "Комфорт",
 };
 
 public static readonly Dictionary<ConditionType, string> Conditions = new()
 {
     [ConditionType.ExternalBleeding] = "Външно кървене",
-    [ConditionType.Hemothorax] = "Хемоторакс",
+    [ConditionType.InternalBleeding] = "Вътрешно кървене",
     [ConditionType.IntracranialProcess] = "Вътречерепен процес",
     [ConditionType.AirwayObstruction] = "Запушване на дихателните пътища",
     [ConditionType.LungInjury] = "Увреждане на белите дробове",
