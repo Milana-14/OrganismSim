@@ -5,7 +5,9 @@ public class ConditionEffectRegistry
     private static readonly Dictionary<ConditionType, IConditionEffect?> Effects = new()
     {
         [ConditionType.ExternalBleeding] = new ExternalBleedingEffect(),
-        [ConditionType.InternalBleeding] = new InternalBleedingEffect(),
+        [ConditionType.Hemothorax] = new HemothoraxEffect(),
+        [ConditionType.IntraAbdominalBleeding] = new IntraAbdominalBleedingEffect(),
+        [ConditionType.PericardialTamponade] = new PericardialTamponadeEffect(),
         [ConditionType.ImpairedCerebralBloodFlow] = new ImpairedCerebralBloodFlowEffect(),
         [ConditionType.IntracranialProcess] = new IntracranialProcessEffect(),
         [ConditionType.AirwayObstruction] = new AirwayObstructionEffect(),

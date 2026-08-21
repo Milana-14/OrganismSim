@@ -9,40 +9,55 @@ public sealed class ExternalBleedingEffect : IConditionEffect
 
     public void ApplyTick(Patient patient, int seconds, double severity)
     {
-        patient.Physiology.Adjust(ParameterType.BloodVolume, seconds * -severity * 0.042); // balance
-        
         if (patient.ExternalBleedingType == ExternalBleedingType.Arterial)
         {
-            
+            double bpRatio = patient.Physiology.Get(ParameterType.BloodPressure) / ParameterRange.All[ParameterType.BloodPressure].NormalMin;
+            double rate = -severity * 0.042 * 3.0 * Math.Clamp(bpRatio, 0.3, 1.3); // balance — забавя се, но никога не спира сам
+            patient.Physiology.Adjust(ParameterType.BloodVolume, seconds * rate);
         }
-        else if (patient.ExternalBleedingType == ExternalBleedingType.Venous)
+        else
         {
-            
+            patient.Physiology.Adjust(ParameterType.BloodVolume, seconds * -severity * 0.042); // balance
+            if (severity < 4) patient.Pathology.Adjust(ConditionType.ExternalBleeding, -seconds * 0.007); // balance — бавно самосъсирване само при леки венозни
         }
     }
 }
 
-public sealed class InternalBleedingEffect : IConditionEffect
+public sealed class HemothoraxEffect : IConditionEffect
 {
-    public ConditionType Type => ConditionType.InternalBleeding;
+    public ConditionType Type => ConditionType.Hemothorax;
 
     public void ApplyTick(Patient patient, int seconds, double severity)
     {
-        if (patient.InternalBleedingType == InternalBleedingType.Hemothorax)
+        patient.Physiology.Adjust(ParameterType.BloodVolume, seconds * -severity * 0.25); // balance
+        patient.Physiology.Adjust(ParameterType.PleuralBloodVolume, seconds * severity * 0.02); // balance
+    }
+}
+
+public sealed class IntraAbdominalBleedingEffect : IConditionEffect
+{
+    public ConditionType Type => ConditionType.IntraAbdominalBleeding;
+
+    public void ApplyTick(Patient patient, int seconds, double severity)
+    {
+        patient.Physiology.Adjust(ParameterType.BloodVolume, seconds * -severity * 0.3); // balance
+
+        if (severity >= 7)
         {
-            patient.Physiology.Adjust(ParameterType.BloodVolume, seconds * -severity * 0.25); // balance
-            patient.Physiology.Adjust(ParameterType.PleuralBloodVolume, seconds * severity * 0.02); // balance
+            double maxAchievable = ParameterRange.All[ParameterType.RespiratoryRate].NormalMax * (1 - (severity - 7) / 10.0); // balance
+            double current = patient.Physiology.Get(ParameterType.RespiratoryRate);
+            if (current > maxAchievable) patient.Physiology.Set(ParameterType.RespiratoryRate, seconds * maxAchievable);
         }
-        else if (patient.InternalBleedingType == InternalBleedingType.IntraAbdominal)
-        {
-            patient.Physiology.Adjust(ParameterType.BloodVolume, seconds * -severity * 0.3); // balance
-            // else
-        }
-        else if (patient.InternalBleedingType == InternalBleedingType.PericardialTamponade)
-        {
-            patient.Physiology.Adjust(ParameterType.BloodVolume, seconds * -severity * 0.15); // balance
-            // else
-        }
+    }
+}
+
+public sealed class PericardialTamponadeEffect : IConditionEffect
+{
+    public ConditionType Type => ConditionType.PericardialTamponade;
+
+    public void ApplyTick(Patient patient, int seconds, double severity)
+    {
+        patient.Physiology.Adjust(ParameterType.BloodVolume, seconds * -severity * 0.02); // balance
     }
 }
 

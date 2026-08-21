@@ -18,24 +18,26 @@ public sealed class HypoperfusionBrainDamageEffect : IParameterThresholdEffect
 
     private static double Deficit(IReadOnlyDictionary<ParameterType, double> snapshot, ParameterType type)
     {
-        var range = ParameterRange.All[type];
-        return Math.Max(0, range.NormalMin - snapshot[type]);
+        return Math.Max(0, ParameterRange.All[type].NormalMin - snapshot[type]);
     }
 }
 
 public sealed class SystemicHypoperfusionEffect : IParameterThresholdEffect
 {
     private const double MaxContribution = 40; // balance
+    private const double ApproachRatePerSecond = 0.08; // balance
+    
     public void ApplyTick(Patient patient, IReadOnlyDictionary<ParameterType, double> snapshot, int seconds)
     {
-        double bpDeficitRatio = LowDeficitRatio(snapshot, ParameterType.BloodPressure);
-        double damage = seconds * bpDeficitRatio * 0.15; // balance
+        double bpDeficitRatio = Math.Clamp(LowDeficitRatio(snapshot, ParameterType.BloodPressure), 0, 1);
+        double floor = Math.Max(0, ParameterRange.All[ParameterType.Consciousness].NormalMax - MaxContribution * bpDeficitRatio);
 
-        double consciousness = patient.Physiology.Get(ParameterType.Consciousness);
-        if (consciousness - damage < ParameterRange.All[ParameterType.Consciousness].NormalMax - MaxContribution) return;
+        double current = snapshot[ParameterType.Consciousness];
+        if (current <= floor) return;
 
-        patient.Physiology.Adjust(ParameterType.Consciousness, -damage);
-        patient.Physiology.Adjust(ParameterType.BrainFunction, -damage * 0.7);
+        double delta = (current - floor) * ApproachRatePerSecond * seconds;
+        patient.Physiology.Adjust(ParameterType.Consciousness, -delta);
+        patient.Physiology.Adjust(ParameterType.BrainFunction, -delta * 0.7);
     }
 
     public double LowDeficitRatio(IReadOnlyDictionary<ParameterType, double> snapshot, ParameterType type)
@@ -185,7 +187,9 @@ public sealed class StressRegulationEffect : IParameterThresholdEffect
     private static readonly IReadOnlyDictionary<ConditionType, double> StressWeights = new Dictionary<ConditionType, double>
     {
         [ConditionType.ExternalBleeding] = 0.25,        // видимата кръв - силен психологически тригер
-        [ConditionType.InternalBleeding] = 0.12,        // невидимо за пациента, само слабост
+        [ConditionType.Hemothorax] = 0.15,              // вижда се кръв при дышане/кашляне — по-тревожно от скритата кръв
+        [ConditionType.IntraAbdominalBleeding] = 0.1,   // само слабост
+        [ConditionType.PericardialTamponade] = 0.15,    // тревога/беспокойство като ранен признак
         [ConditionType.IntracranialProcess] = 0.15,
         [ConditionType.AirwayObstruction] = 0.35,       // "не мога да дишам" - най-паникьосващото усещане, което съществува
         [ConditionType.LungInjury] = 0.2,

@@ -16,7 +16,6 @@ public class Patient
     public PatientPosture Posture { get; set; } = PatientPosture.Supine;
     
     public ExternalBleedingType? ExternalBleedingType  { get; set; }
-    public InternalBleedingType? InternalBleedingType  { get; set; }
     public HeartFailureType? HeartFailureType { get; set; }
     public AnaphylaxisPhenotype? AnaphylaxisPhenotype { get; set; }
     

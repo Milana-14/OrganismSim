@@ -4,17 +4,17 @@ public sealed class ParameterThresholdEngine
 {
     private readonly List<IParameterThresholdEffect> _effects = new()
     {
+        new GasExchangeEffect(),
+        new PulmonaryCapillaryPressureTrigger(),
+        new HyperperfusionIcpEffect(),
         new HypoperfusionBrainDamageEffect(),
         new SystemicHypoperfusionEffect(),
         new ConsciousnessMetabolicEffect(),
         new RespiratoryDriveEffect(),
-        new HyperperfusionIcpEffect(),
+        new StressRegulationEffect(),
         new ComfortDecayEffect(),
         new AutonomicReflexEffect(),
-        new PulmonaryCapillaryPressureTrigger(),
         new OsmoticDehydrationTrigger(),
-        new GasExchangeEffect(),
-        new StressRegulationEffect(),
         new AirwayObstructionCapEffect(),
     };
 

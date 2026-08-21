@@ -8,7 +8,9 @@ public static class DiagnosisFactory
     private static readonly Dictionary<DiagnosisType, IDiagnosisProfile> Profiles = new()
     {
         [DiagnosisType.ExternalBleeding] = new ExternalBleedingProfile(),
-        [DiagnosisType.InternalBleeding] = new InternalBleedingProfile(),
+        [DiagnosisType.Hemothorax] = new HemothoraxProfile(),
+        [DiagnosisType.IntraAbdominalBleeding] = new IntraAbdominalBleedingProfile(),
+        [DiagnosisType.PericardialTamponade] = new PericardialTamponadeProfile(),
         [DiagnosisType.MyocardialInfarction] = new MyocardialInfarctionProfile(),
         [DiagnosisType.Stroke] = new StrokeProfile(),
         [DiagnosisType.Hypoglycemia] = new HypoglycemiaProfile(),

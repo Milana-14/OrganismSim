@@ -49,7 +49,9 @@ public static readonly Dictionary<ParameterType, string> Parameters = new()
 public static readonly Dictionary<ConditionType, string> Conditions = new()
 {
     [ConditionType.ExternalBleeding] = "Външно кървене",
-    [ConditionType.InternalBleeding] = "Вътрешно кървене",
+    [ConditionType.Hemothorax] = "Хемоторакс",
+    [ConditionType.IntraAbdominalBleeding] = "Вътрешно коремно кървене",
+    [ConditionType.PericardialTamponade] = "Перикардна тампонада",
     [ConditionType.IntracranialProcess] = "Вътречерепен процес",
     [ConditionType.AirwayObstruction] = "Запушване на дихателните пътища",
     [ConditionType.LungInjury] = "Увреждане на белите дробове",

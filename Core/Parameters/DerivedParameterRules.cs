@@ -12,7 +12,11 @@ public sealed class BloodPressureRule : IDerivedParameterRule
         double hrRatio = HeartRateFactor(snapshot[ParameterType.HeartRate]);
         double contractilityFactor = 1 - pathology.GetSeverity(ConditionType.HeartFailure) / 10.0 * 0.6; // balance
 
-        return baselineMmHg * volumeRatio * pvrRatio * hrRatio * contractilityFactor;
+        double pleuralRatio = Math.Clamp(snapshot[ParameterType.PleuralBloodVolume] / ParameterRange.All[ParameterType.PleuralBloodVolume].LethalHigh, 0, 1);
+        double tamponade = pathology.GetSeverity(ConditionType.PericardialTamponade);
+        double obstructiveFactor = Math.Clamp(1 - pleuralRatio * 0.4 - tamponade / 10.0 * 0.7, 0.1, 1); // balance
+
+        return baselineMmHg * volumeRatio * pvrRatio * hrRatio * contractilityFactor * obstructiveFactor;
     }
     
     private static double HeartRateFactor(double heartRate)
