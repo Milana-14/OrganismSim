@@ -27,6 +27,7 @@ public sealed class HomeostasisEngine
         if (type == ParameterType.BloodVolume) return 0.005; // balance
         if (type == ParameterType.BloodCo2Level) return 0.003; // balance
         if (type == ParameterType.BodyTemperature) return 0.002; // balance
+        if (type == ParameterType.BloodGlucoseLevel) return 0.003; // balance
         if (type == ParameterType.Comfort) return 0; // balance
         return 0.01;
     }

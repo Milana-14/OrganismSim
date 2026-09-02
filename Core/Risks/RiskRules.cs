@@ -14,10 +14,11 @@ public sealed class SeizureRiskRule : IRiskRule
         double score = brainDeficit * 0.4 + glucoseDeficit * 0.3 + icpSeverity * 0.3; // balance
         return Math.Clamp(score, 0, 1);
     }
-
-    public void Trigger(Patient patient)
+    
+    public void Trigger(Patient patient, double score)
     {
-        patient.Pathology.SetSeverity(ConditionType.Seizure, 6); // balance (начална тежест на пристъпа)
+        if (patient.Pathology.GetSeverity(ConditionType.Seizure) > 0) return;
+        patient.Pathology.SetSeverity(ConditionType.Seizure, 3 + score * 5); // balance
     }
 
     private static double Deficit(IReadOnlyDictionary<ParameterType, double> snapshot, ParameterType type)
@@ -34,18 +35,20 @@ public sealed class ChokingRiskRule : IRiskRule
 
     public double ComputeProbability(IReadOnlyDictionary<ParameterType, double> snapshot, PathologicalState pathology, Patient patient)
     {
+        if (patient.AirwayObstructionIsPositional) return 0;
+        
         bool unconscious = snapshot[ParameterType.Consciousness] <= 2;
         bool supine = patient.Posture == PatientPosture.Supine;
 
         return unconscious && supine ? 0.3 : 0; // balance
     }
 
-    public void Trigger(Patient patient)
+    public void Trigger(Patient patient, double _)
     {
         patient.Pathology.Adjust(ConditionType.AirwayObstruction, 5); // balance
+        patient.AirwayObstructionIsPositional = true; // balance
     }
-} // ами ако пострадалият вече е започнал да се задушава, но играчът го премести в странично положение? 
-// Май трябва да спре да се задушава... но това не сме го направили в кода
+}
 
 
 public sealed class LethalArrhythmiaRiskRule : IRiskRule
@@ -61,7 +64,7 @@ public sealed class LethalArrhythmiaRiskRule : IRiskRule
         return Math.Clamp(heartFailureSeverity / 10.0 * 0.4, 0, 1); // balance
     }
 
-    public void Trigger(Patient patient)
+    public void Trigger(Patient patient, double _)
     {
         patient.Physiology.Set(ParameterType.HeartRate, 210); // balance
     }

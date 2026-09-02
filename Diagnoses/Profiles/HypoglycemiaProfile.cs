@@ -9,6 +9,7 @@ public class HypoglycemiaProfile : IDiagnosisProfile
 
     public void Initialize(Patient patient)
     {
-        patient.Pathology.SetSeverity(ConditionType.Hypoglycemia, 6);
+        patient.Pathology.SetSeverity(ConditionType.Hypoglycemia, 3);
+        patient.Physiology.Set(ParameterType.BloodGlucoseLevel, 60);
     }
 }

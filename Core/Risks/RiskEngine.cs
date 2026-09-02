@@ -22,7 +22,7 @@ public sealed class RiskEngine
 
             if (_random.NextDouble() < tickProbability)
             {
-                rule.Trigger(patient);
+                rule.Trigger(patient, windowProbability);
             }
         }
     }

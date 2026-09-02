@@ -158,6 +158,7 @@ public sealed class HypoglycemiaEffect : IConditionEffect
 
     public void ApplyTick(Patient patient, int seconds, double severity)
     {
+        if (severity < 8) patient.Pathology.Adjust(ConditionType.Hypoglycemia, seconds * 0.007); // balance
         patient.Physiology.Adjust(ParameterType.BloodGlucoseLevel, seconds * -severity * 0.05); // balance
     }
 }
@@ -184,10 +185,8 @@ public sealed class SeizureEffect : IConditionEffect
     public void ApplyTick(Patient patient, int seconds, double severity)
     {
         patient.Physiology.Adjust(ParameterType.Consciousness, seconds * -severity * 0.3); // balance
-        patient.Physiology.Adjust(ParameterType.BloodOxygenLevel, seconds * -severity * 0.2); // balance
-        patient.Pathology.Adjust(ConditionType.IncreasedSympatheticActivity, seconds * severity * 0.1); // balance
-
-        patient.Pathology.Adjust(ConditionType.Seizure, seconds * -0.3); // balance (отшумяване)
+        patient.Physiology.Adjust(ParameterType.BloodOxygenLevel, seconds * -severity * 0.05); // balance
+        patient.Pathology.Adjust(ConditionType.Seizure, seconds * -0.3); // balance
     }
 }
 

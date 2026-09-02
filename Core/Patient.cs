@@ -14,6 +14,7 @@ public class Patient
     private readonly SymptomEngine _symptomEngine = new();
     private readonly HomeostasisEngine _homeostasisEngine = new();
     public PatientPosture Posture { get; set; } = PatientPosture.Supine;
+    public bool AirwayObstructionIsPositional { get; set; }
     
     public ExternalBleedingType? ExternalBleedingType  { get; set; }
     public HeartFailureType? HeartFailureType { get; set; }

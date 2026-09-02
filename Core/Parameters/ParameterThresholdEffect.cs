@@ -323,3 +323,15 @@ public sealed class AirwayObstructionCapEffect : IParameterThresholdEffect
         }
     }
 }
+
+public sealed class PositionalAirwayReliefEffect : IParameterThresholdEffect
+{
+    public void ApplyTick(Patient patient, IReadOnlyDictionary<ParameterType, double> snapshot, int seconds)
+    {
+        if (!patient.AirwayObstructionIsPositional) return;
+        if (patient.Posture == PatientPosture.Supine) return;
+
+        patient.Pathology.SetSeverity(ConditionType.AirwayObstruction, 0);
+        patient.AirwayObstructionIsPositional = false;
+    }
+}

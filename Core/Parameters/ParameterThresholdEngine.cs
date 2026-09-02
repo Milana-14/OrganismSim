@@ -16,6 +16,7 @@ public sealed class ParameterThresholdEngine
         new AutonomicReflexEffect(),
         new OsmoticDehydrationTrigger(),
         new AirwayObstructionCapEffect(),
+        new PositionalAirwayReliefEffect(),
     };
 
     public void ApplyTick(Patient patient, IReadOnlyDictionary<ParameterType, double> snapshot, int seconds)
