@@ -1,3 +1,5 @@
+using OrganismSim.Diagnoses;
+
 namespace OrganismSim.Core;
 
 public sealed class SeizureRiskRule : IRiskRule
@@ -25,6 +27,49 @@ public sealed class SeizureRiskRule : IRiskRule
     {
         var range = ParameterRange.All[type];
         return Math.Max(0, range.NormalMin - snapshot[type]);
+    }
+}
+
+public sealed class HypoglycemicCardioCerebralRiskRule : IRiskRule
+{
+    public string Name => "Риск от инфаркт/инсулт при тежка хипогликемия";
+    public double ReferenceWindowSeconds => 120; // balance
+
+    public double ComputeProbability(IReadOnlyDictionary<ParameterType, double> snapshot, PathologicalState pathology, Patient patient)
+    {
+        double hypo = patient.Pathology.GetSeverity(ConditionType.Hypoglycemia);
+        if (hypo < 6) return 0;
+        
+        double sympathetic = pathology.GetSeverity(ConditionType.IncreasedSympatheticActivity);
+        if (sympathetic < 6) return 0;
+
+        return Math.Clamp((sympathetic - 6) / 4.0 * 0.15, 0, 0.15); // balance
+    }
+
+    public void Trigger(Patient patient, double score)
+    {
+        bool stroke = Random.Shared.NextDouble() < 0.4; // balance
+        if (stroke) DiagnosisFactory.AddProfile(DiagnosisType.Stroke, patient); //  I want to balance severity
+        else DiagnosisFactory.AddProfile(DiagnosisType.MyocardialInfarction, patient); // I want to balance severity
+    }
+}
+
+public sealed class FallRiskRule : IRiskRule
+{
+    public string Name => "Риск от падане";
+    public double ReferenceWindowSeconds => 60; // balance
+
+    public double ComputeProbability(IReadOnlyDictionary<ParameterType, double> snapshot, PathologicalState pathology, Patient patient)
+    {
+        if (patient.Posture != PatientPosture.Standing) return 0;
+        double brainDeficit = Math.Max(0, ParameterRange.All[ParameterType.BrainFunction].NormalMin - snapshot[ParameterType.BrainFunction]) / 80.0;
+        return Math.Clamp(brainDeficit * 0.5, 0, 0.5); // balance
+    }
+
+    public void Trigger(Patient patient, double score)
+    {
+        patient.Posture = PatientPosture.Supine; 
+        DiagnosisFactory.AddProfile(DiagnosisType.Fall, patient); // I want to balance severity
     }
 }
 

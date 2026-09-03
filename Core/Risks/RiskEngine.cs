@@ -5,6 +5,8 @@ public sealed class RiskEngine
     private readonly List<IRiskRule> _rules = new()
     {
         new SeizureRiskRule(),
+        new HypoglycemicCardioCerebralRiskRule(),
+        new FallRiskRule (),
         new ChokingRiskRule(),
         new LethalArrhythmiaRiskRule(),
     };

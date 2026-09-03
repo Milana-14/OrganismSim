@@ -13,6 +13,7 @@ public class Patient
     private readonly RiskEngine _riskEngine = new();
     private readonly SymptomEngine _symptomEngine = new();
     private readonly HomeostasisEngine _homeostasisEngine = new();
+    public AbsorptionQueue Absorptions { get; } = new();
     public PatientPosture Posture { get; set; } = PatientPosture.Supine;
     public bool AirwayObstructionIsPositional { get; set; }
     
@@ -49,6 +50,7 @@ public class Patient
         _conditionEngine.ApplyTick(this, seconds);
         _parameterThresholdEngine.ApplyTick(this, startOfTickSnapshot, seconds);
         _riskEngine.ApplyTick(this, startOfTickSnapshot, seconds);
+        Absorptions.ApplyTick(this, seconds);
         Physiology.RecomputeDerived(Pathology);
 
         HashSet<SymptomType> old = ActiveSymptoms;

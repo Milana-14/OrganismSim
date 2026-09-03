@@ -49,7 +49,6 @@ public sealed class CerebralBloodFlowRule : IDerivedParameterRule
         double oxygenFactor = Math.Clamp(snapshot[ParameterType.BloodOxygenLevel] / o2NormalMid, 0.3, 1.1); // balance
 
         double strokeSeverity = pathology.GetSeverity(ConditionType.ImpairedCerebralBloodFlow);
-        double heartFailureSeverity = pathology.GetSeverity(ConditionType.HeartFailure);
         double sympatheticSeverity = pathology.GetSeverity(ConditionType.IncreasedSympatheticActivity);
         double parasympatheticSeverity = pathology.GetSeverity(ConditionType.IncreasedParasympatheticActivity);
 
@@ -94,8 +93,6 @@ public sealed class PeripheralOrganBloodFlowRule : IDerivedParameterRule
         var o2Range = ParameterRange.All[ParameterType.BloodOxygenLevel];
         double o2NormalMid = (o2Range.NormalMin + o2Range.NormalMax) / 2.0;
         double oxygenFactor = Math.Clamp(snapshot[ParameterType.BloodOxygenLevel] / o2NormalMid, 0.3, 1.1); // balance
-
-        double heartFailureSeverity = pathology.GetSeverity(ConditionType.HeartFailure);
         double sympatheticSeverity = pathology.GetSeverity(ConditionType.IncreasedSympatheticActivity);
         double parasympatheticSeverity = pathology.GetSeverity(ConditionType.IncreasedParasympatheticActivity);
 

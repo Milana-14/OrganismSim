@@ -30,4 +30,9 @@ public static class DiagnosisFactory
         Profiles[type].Initialize(patient);
         return patient;
     }
+
+    public static void AddProfile(DiagnosisType type, Patient patient)
+    {
+        Profiles[type].Initialize(patient);
+    }
 }

@@ -14,7 +14,7 @@ public static class DeathCauseMap
         [ParameterType.RespiratoryRate] = (DeathCause.RespiratoryArrest, DeathCause.RespiratoryFailure),
         [ParameterType.BloodOxygenLevel] = (DeathCause.Hypoxia, DeathCause.None),
         [ParameterType.BloodCo2Level] = (DeathCause.HypocapnicShock, DeathCause.HypercapnicRespiratoryFailure),
-        [ParameterType.BloodGlucoseLevel] = (DeathCause.HypoglycemicCrisis, DeathCause.HyperglycemicCrisis),
+        [ParameterType.BloodGlucoseLevel] = (DeathCause.None, DeathCause.HyperglycemicCrisis),
         [ParameterType.BodyTemperature] = (DeathCause.Hypothermia, DeathCause.Hyperthermia),
         [ParameterType.BrainFunction] = (DeathCause.BrainDeath, DeathCause.None),
     };

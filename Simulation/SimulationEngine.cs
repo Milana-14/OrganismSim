@@ -1,4 +1,4 @@
-using OrganismSim.Actions;
+using OrganismSim.PlayerActions;
 using OrganismSim.Core;
 using OrganismSim.Diagnoses;
 
@@ -6,11 +6,12 @@ namespace OrganismSim.Simulation;
 
 public sealed class SimulationEngine
 {
-    private const int AmbulanceEtaSeconds = 180;
+    private const int AmbulanceEtaSeconds = 300;
 
         private readonly Patient _patient;
         private readonly IDiagnosisProfile _profile;
         private readonly ConsoleGameLogger _logger;
+        private readonly List<IWaitPlayerAction> _waitActions;
         private readonly List<IPlayerAction> _actions;
 
         private bool _ambulanceCalled;
@@ -22,6 +23,7 @@ public sealed class SimulationEngine
             _patient = patient;
             _profile = profile;
             _logger = logger;
+            _waitActions = ActionCatalog.WaitBuildDefault();
             _actions = ActionCatalog.BuildDefault();
         }
 
@@ -47,10 +49,21 @@ public sealed class SimulationEngine
                 }
                 else
                 {
-                    var action = _actions[choice - 1];
+                    IWaitPlayerAction waitAction;
+                    IPlayerAction action;
+                    
+                    if (choice <= _waitActions.Count)
+                    {
+                        waitAction = _waitActions[choice - 1];
+                        outcome = AdvanceTime(waitAction.TimeCostSeconds);
+                    }
+                    else
+                    {
+                        action = _actions[choice - _waitActions.Count - 1];
+                        action.Execute(_patient);
+                    }
+                    
                     Console.WriteLine();
-
-                    outcome = AdvanceTime(action.TimeCostSeconds);
                     PrintStatus();
                 }
             }
@@ -87,9 +100,13 @@ public sealed class SimulationEngine
             Console.WriteLine();
             Console.WriteLine("Колко време изчакваш?");
             Console.WriteLine("  0. Обади се на 112 / линейка");
+            for (int i = 0; i < _waitActions.Count; i++)
+            {
+                Console.WriteLine($"  {i + 1}. {_waitActions[i].Name}");
+            }
             for (int i = 0; i < _actions.Count; i++)
             {
-                Console.WriteLine($"  {i + 1}. {_actions[i].Name}");
+                Console.WriteLine($"  {i + _waitActions.Count + 1}. {_actions[i].Name}");
             }
             Console.WriteLine("  Q. Изход");
         }
@@ -106,7 +123,12 @@ public sealed class SimulationEngine
                     return -1;
                 }
 
-                if (int.TryParse(input, out int choice) && choice >= 0 && choice <= _actions.Count)
+                if (int.TryParse(input, out int waitChoice) && waitChoice >= 0 && waitChoice <= _waitActions.Count)
+                {
+                    return waitChoice;
+                }
+                
+                if (int.TryParse(input, out int choice) && choice >= _waitActions.Count && choice <= _waitActions.Count + _actions.Count)
                 {
                     return choice;
                 }

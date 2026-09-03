@@ -59,20 +59,25 @@ public sealed class ConsciousnessMetabolicEffect : IParameterThresholdEffect
         patient.Physiology.Adjust(ParameterType.BrainFunction, -delta * 0.7);
         patient.Physiology.Adjust(ParameterType.Consciousness, -delta);
     }
-
+    
     private static double GlucoseDamage(IReadOnlyDictionary<ParameterType, double> snapshot)
     {
         var range = ParameterRange.All[ParameterType.BloodGlucoseLevel];
         double value = snapshot[ParameterType.BloodGlucoseLevel];
 
-        if (value < range.NormalMin) return (range.NormalMin - value) * 0.02; // balance
+        const double neuroglycopenicFloor = 51.0; // balance
+        if (value < neuroglycopenicFloor)
+        {
+            double deficit = neuroglycopenicFloor - value;
+            return deficit * 0.03; // balance
+        }
 
         if (value > range.NormalMax)
         {
             double excess = value - range.NormalMax;
             double lethalSpan = range.LethalHigh - range.NormalMax;
             double normalized = excess / lethalSpan;
-            return normalized * normalized * 0.7; // balance
+            return normalized * normalized * 0.7; // balance — без изменений
         }
 
         return 0;

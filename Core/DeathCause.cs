@@ -17,7 +17,6 @@ public enum DeathCause
     Hypoxia,                     // BloodOxygenLevel <= lethalLow
     HypocapnicShock,             // BloodCo2Level <= lethalLow
     HypercapnicRespiratoryFailure, // BloodCo2Level >= lethalHigh
-    HypoglycemicCrisis,          // BloodGlucoseLevel <= lethalLow
     HyperglycemicCrisis,         // BloodGlucoseLevel >= lethalHigh
     Hypothermia,                  // BodyTemperature <= lethalLow
     Hyperthermia,                 // BodyTemperature >= lethalHigh
