@@ -15,7 +15,25 @@ public sealed class AspirationComplication : IComplicationRule
 public sealed class CardiacEventComplication : IComplicationRule
 {
     public string Description => "прекарала лек инфаркт вследствие тежката хипогликемия";
-    public bool Applies(Patient patient) => patient.Pathology.GetSeverity(ConditionType.HeartFailure) > 0;
+    public bool Applies(Patient patient) => patient.Exposure.MyocardialInfractionEvents > 0; // было HeartFailure>0
+}
+
+public sealed class StrokeComplication : IComplicationRule
+{
+    public string Description => "с остатъчен неврологичен дефицит вследствие лек инсулт по време на епизода";
+    public bool Applies(Patient patient) => patient.Exposure.StrokeEvents > 0;
+}
+
+public sealed class FallInjuryComplication : IComplicationRule
+{
+    public string Description => "с навяхване/натъртване вследствие падането по време на епизода";
+    public bool Applies(Patient patient) => patient.Exposure.FallingEvents > 0;
+}
+
+public sealed class SurvivedArrhythmiaComplication : IComplicationRule
+{
+    public string Description => "оцеляла след животозастрашаваща сърдечна аритмия по време на епизода";
+    public bool Applies(Patient patient) => patient.Exposure.LethalArrhythmiaEvents > 0;
 }
 
 public sealed class SeizureInjuryComplication : IComplicationRule

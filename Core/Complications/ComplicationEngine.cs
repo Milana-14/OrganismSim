@@ -7,6 +7,9 @@ public class ComplicationEngine
         new HypoxicBrainInjuryComplication(),
         new AspirationComplication(),
         new CardiacEventComplication(),
+        new StrokeComplication(),
+        new FallInjuryComplication(),
+        new SurvivedArrhythmiaComplication(),
         new SeizureInjuryComplication(),
     };
 
