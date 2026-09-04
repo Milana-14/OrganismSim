@@ -16,6 +16,7 @@ public sealed class GiveWater : IPlayerAction
         if (Random.Shared.NextDouble() < chokeProbability)
         {
             patient.Pathology.Adjust(ConditionType.AirwayObstruction, chokeProbability * 6); // balance
+            patient.Exposure.RecordChoking();
             return new ActionResult(ActionOutcome.Complication, "Бабата се задавя с водата.");
         }
 
@@ -38,6 +39,7 @@ public sealed class GiveJuice : IPlayerAction
         if (Random.Shared.NextDouble() < chokeProbability)
         {
             patient.Pathology.Adjust(ConditionType.AirwayObstruction, chokeProbability * 6); // balance
+            patient.Exposure.RecordChoking();
             return new ActionResult(ActionOutcome.Complication, "Бабата се задавя със сока.");
         }
 
@@ -62,10 +64,35 @@ public sealed class GiveBiscuit : IPlayerAction
         if (Random.Shared.NextDouble() < chokeProbability)
         {
             patient.Pathology.Adjust(ConditionType.AirwayObstruction, chokeProbability * 6); // balance
+            patient.Exposure.RecordChoking();
             return new ActionResult(ActionOutcome.Complication, "Бабата се задавя с бисквитката.");
         }
 
         patient.Absorptions.Enqueue(ParameterType.BloodGlucoseLevel, 34, 60); // balance
         return new ActionResult(ActionOutcome.Success, "Дадохте бисквитка.");
+    }
+}
+
+public sealed class GiveGlucagon : IPlayerAction
+{
+    public string Name => "Дай глюкагон (инжекция)";
+
+    public ActionResult Execute(Patient patient)
+    {
+        const double vomitProbability = 0.15; // balance
+
+        bool vomits = Random.Shared.NextDouble() < vomitProbability;
+        if (vomits && patient.Physiology.Get(ParameterType.Consciousness) < 15)
+        {
+            patient.Pathology.Adjust(ConditionType.AirwayObstruction, 4); // balance
+            patient.Exposure.RecordChoking();
+        }
+
+        patient.Absorptions.Enqueue(ParameterType.BloodGlucoseLevel, 45 * 0.7, 90); // balance
+        patient.Pathology.Adjust(ConditionType.IncreasedSympatheticActivity, 1.5); // balance
+
+        return vomits
+            ? new ActionResult(ActionOutcome.Complication, "Бабата повръща след инжекцията.")
+            : new ActionResult(ActionOutcome.Success, "Инжектирахте глюкагон.");
     }
 }

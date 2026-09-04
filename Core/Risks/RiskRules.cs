@@ -21,6 +21,7 @@ public sealed class SeizureRiskRule : IRiskRule
     {
         if (patient.Pathology.GetSeverity(ConditionType.Seizure) > 0) return;
         patient.Pathology.SetSeverity(ConditionType.Seizure, 3 + score * 5); // balance
+        patient.Exposure.RecordSeizure();
     }
 
     private static double Deficit(IReadOnlyDictionary<ParameterType, double> snapshot, ParameterType type)
@@ -49,8 +50,16 @@ public sealed class HypoglycemicCardioCerebralRiskRule : IRiskRule
     public void Trigger(Patient patient, double score)
     {
         bool stroke = Random.Shared.NextDouble() < 0.4; // balance
-        if (stroke) DiagnosisFactory.AddProfile(DiagnosisType.Stroke, patient); //  I want to balance severity
-        else DiagnosisFactory.AddProfile(DiagnosisType.MyocardialInfarction, patient); // I want to balance severity
+        if (stroke)
+        {
+            DiagnosisFactory.AddProfile(DiagnosisType.Stroke, patient); //  I want to balance severity - трябва инсултът да е лек
+            patient.Exposure.RecordStroke();
+        }
+        else
+        {
+            DiagnosisFactory.AddProfile(DiagnosisType.MyocardialInfarction, patient); // I want to balance severity - трябва инфарктът да е лек
+            patient.Exposure.RecordMyocardialInfraction();
+        }
     }
 }
 
@@ -70,6 +79,7 @@ public sealed class FallRiskRule : IRiskRule
     {
         patient.Posture = PatientPosture.Supine; 
         DiagnosisFactory.AddProfile(DiagnosisType.Fall, patient); // I want to balance severity
+        patient.Exposure.RecordFallings();
     }
 }
 
@@ -92,6 +102,7 @@ public sealed class ChokingRiskRule : IRiskRule
     {
         patient.Pathology.Adjust(ConditionType.AirwayObstruction, 5); // balance
         patient.AirwayObstructionIsPositional = true; // balance
+        patient.Exposure.RecordChoking();
     }
 }
 
@@ -112,5 +123,6 @@ public sealed class LethalArrhythmiaRiskRule : IRiskRule
     public void Trigger(Patient patient, double _)
     {
         patient.Physiology.Set(ParameterType.HeartRate, 210); // balance
+        patient.Exposure.RecordLethalArrhythmia();
     }
 }

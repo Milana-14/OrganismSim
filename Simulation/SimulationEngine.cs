@@ -7,16 +7,16 @@ namespace OrganismSim.Simulation;
 public sealed class SimulationEngine
 {
     private const int AmbulanceEtaSeconds = 300;
-
-        private readonly Patient _patient;
-        private readonly IDiagnosisProfile _profile;
-        private readonly ConsoleGameLogger _logger;
-        private readonly List<IWaitPlayerAction> _waitActions;
-        private readonly List<IPlayerAction> _actions;
-
-        private bool _ambulanceCalled;
-        private int _ambulanceEtaRemaining;
-        private int _elapsedSeconds;
+    
+    private readonly Patient _patient;
+    private readonly IDiagnosisProfile _profile; 
+    private readonly ConsoleGameLogger _logger;
+    private readonly List<IWaitPlayerAction> _waitActions; 
+    private readonly List<IPlayerAction> _actions;
+    
+    private bool _ambulanceCalled;
+    private int _ambulanceEtaRemaining;
+    private int _elapsedSeconds;
 
         public SimulationEngine(Patient patient, IDiagnosisProfile profile, ConsoleGameLogger logger)
         {
@@ -235,11 +235,17 @@ public sealed class SimulationEngine
             Console.WriteLine("=========================================");
         }
 
-        private string DescribeOutcome(SimulationOutcome outcome) => outcome switch
+        private string DescribeOutcome(SimulationOutcome outcome)
         {
-            SimulationOutcome.Died => "Пострадалият е починал",
-            SimulationOutcome.Stabilized => "Пострадалият е стабилизиран",
-            SimulationOutcome.AmbulanceArrivedAlive => "Линейката пристигна, пострадалият е жив",
-            _ => "Неизвестен",
-        };
+            if (outcome == SimulationOutcome.Died) return "Пострадалият е починал";
+            else if (outcome == SimulationOutcome.Stabilized) return "Пострадалият е стабилизиран";
+            else if (outcome == SimulationOutcome.AmbulanceArrivedAlive)
+            {
+                var complications = new ComplicationEngine().Evaluate(_patient); 
+                return complications.Count == 0 
+                    ? "Линейката пристигна, пострадалият е жив"
+                    : $"Линейката пристигна, пострадалият е жив, но {string.Join(", ", complications)}";
+            }
+            return "Неизвестен";
+        }
 }

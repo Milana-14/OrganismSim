@@ -22,7 +22,7 @@ namespace OrganismSim.Core;
     public sealed class SalivationRule : ISymptomRule
     {
         public SymptomType Type => SymptomType.Salivation;
-        public bool IsActive(Patient p) => p.Physiology.Get(ParameterType.BloodGlucoseLevel) < 65; // ранний вегетативный, тот же ярус что Tremor
+        public bool IsActive(Patient p) => p.Physiology.Get(ParameterType.BloodGlucoseLevel) < 65;
     }
 
     public sealed class PalpitationsRule : ISymptomRule
@@ -60,7 +60,7 @@ namespace OrganismSim.Core;
     public sealed class AgitationRule : ISymptomRule
     {
         public SymptomType Type => SymptomType.Agitation;
-        public bool IsActive(Patient p) => p.Physiology.Get(ParameterType.BrainFunction) < 70 && p.Physiology.Get(ParameterType.BrainFunction) >= 40; // ранняя раздражительность, до апатии
+        public bool IsActive(Patient p) => p.Physiology.Get(ParameterType.BrainFunction) < 70 && p.Physiology.Get(ParameterType.BrainFunction) >= 40;
     }
 
     public sealed class PalenessRule : ISymptomRule
@@ -73,7 +73,7 @@ namespace OrganismSim.Core;
     public sealed class MydriasisRule : ISymptomRule
     {
         public SymptomType Type => SymptomType.Mydriasis;
-        public bool IsActive(Patient p) => p.Pathology.GetSeverity(ConditionType.IncreasedSympatheticActivity) > 3; // катехоламин-зависимый мидриаз
+        public bool IsActive(Patient p) => p.Pathology.GetSeverity(ConditionType.IncreasedSympatheticActivity) > 3;
     }
 
     public sealed class NauseaRule : ISymptomRule
@@ -116,13 +116,13 @@ namespace OrganismSim.Core;
     public sealed class ParesthesiaRule : ISymptomRule
     {
         public SymptomType Type => SymptomType.Paresthesia;
-        public bool IsActive(Patient p) => p.Physiology.Get(ParameterType.BloodGlucoseLevel) < 51; // нейрогликопенический порог — совпадает с GlucoseDamage
+        public bool IsActive(Patient p) => p.Physiology.Get(ParameterType.BloodGlucoseLevel) < 51;
     }
 
     public sealed class NumbnessAroundMouthRule : ISymptomRule
     {
         public SymptomType Type => SymptomType.NumbnessAroundMouth;
-        public bool IsActive(Patient p) => p.Physiology.Get(ParameterType.BloodGlucoseLevel) < 50; // классический периоральный симптом, чуть глубже парестезии
+        public bool IsActive(Patient p) => p.Physiology.Get(ParameterType.BloodGlucoseLevel) < 50;
     }
 
     public sealed class BlurredVisionRule : ISymptomRule
@@ -134,7 +134,7 @@ namespace OrganismSim.Core;
     public sealed class DoubleVisionRule : ISymptomRule
     {
         public SymptomType Type => SymptomType.DoubleVision;
-        public bool IsActive(Patient p) => p.Physiology.Get(ParameterType.Consciousness) < 45; // глубже размытого зрения
+        public bool IsActive(Patient p) => p.Physiology.Get(ParameterType.Consciousness) < 45;
     }
 
     public sealed class DifficultyConcentratingRule : ISymptomRule
@@ -153,7 +153,7 @@ namespace OrganismSim.Core;
     public sealed class DisorientationRule : ISymptomRule
     {
         public SymptomType Type => SymptomType.Disorientation;
-        public bool IsActive(Patient p) => p.Physiology.Get(ParameterType.Consciousness) < 60; // глубже Confusion(70)
+        public bool IsActive(Patient p) => p.Physiology.Get(ParameterType.Consciousness) < 60;
     }
 
     public sealed class SlurredSpeechRule : ISymptomRule
@@ -166,25 +166,25 @@ namespace OrganismSim.Core;
     public sealed class CoordinationProblemsRule : ISymptomRule
 {
     public SymptomType Type => SymptomType.CoordinationProblems;
-    public bool IsActive(Patient p) => p.Physiology.Get(ParameterType.BrainFunction) < 55; // тот же порог "суждение нарушено" из стадии отрицания
+    public bool IsActive(Patient p) => p.Physiology.Get(ParameterType.BrainFunction) < 55;
 }
 
     public sealed class ApathyRule : ISymptomRule
     {
         public SymptomType Type => SymptomType.Apathy;
-        public bool IsActive(Patient p) => p.Physiology.Get(ParameterType.BrainFunction) < 40 && p.Physiology.Get(ParameterType.Consciousness) > 15; // после возбуждения, до ступора
+        public bool IsActive(Patient p) => p.Physiology.Get(ParameterType.BrainFunction) < 40 && p.Physiology.Get(ParameterType.Consciousness) > 15;
     }
 
     public sealed class AggressionRule : ISymptomRule
     {
         public SymptomType Type => SymptomType.Aggression;
-        public bool IsActive(Patient p) => p.Physiology.Get(ParameterType.Consciousness) < 55 && p.Physiology.Get(ParameterType.Consciousness) >= 15; // дезориентация с сохранной моторикой — типичное окно агрессии
+        public bool IsActive(Patient p) => p.Physiology.Get(ParameterType.Consciousness) < 55 && p.Physiology.Get(ParameterType.Consciousness) >= 15;
     }
 
     public sealed class ReducedPainResponseRule : ISymptomRule
     {
         public SymptomType Type => SymptomType.ReducedPainResponse;
-        public bool IsActive(Patient p) => p.Physiology.Get(ParameterType.Consciousness) <= 2; // тот же порог, что уже использует ChokingRiskRule
+        public bool IsActive(Patient p) => p.Physiology.Get(ParameterType.Consciousness) <= 2;
     }
 
     public sealed class ReducedTouchResponseRule : ISymptomRule
@@ -202,7 +202,7 @@ namespace OrganismSim.Core;
     public sealed class LossOfSwallowingReflexRule : ISymptomRule
     {
         public SymptomType Type => SymptomType.LossOfSwallowingReflex;
-        public bool IsActive(Patient p) => p.Physiology.Get(ParameterType.Consciousness) < 15; // совпадает с design-doc "state 3: не в состояние да говори"
+        public bool IsActive(Patient p) => p.Physiology.Get(ParameterType.Consciousness) < 15;
     }
 
     public sealed class LossOfSpeech : ISymptomRule
@@ -220,7 +220,7 @@ namespace OrganismSim.Core;
     public sealed class StuporRule : ISymptomRule
     {
         public SymptomType Type => SymptomType.Stupor;
-        public bool IsActive(Patient p) => p.Physiology.Get(ParameterType.Consciousness) < 25 && p.Physiology.Get(ParameterType.Consciousness) >= 15; // между Confusion/Drowsiness и полной ареактивностью
+        public bool IsActive(Patient p) => p.Physiology.Get(ParameterType.Consciousness) < 25 && p.Physiology.Get(ParameterType.Consciousness) >= 15;
     }
 
     public sealed class MuscleToneLossRule : ISymptomRule
@@ -238,7 +238,7 @@ namespace OrganismSim.Core;
     public sealed class SlowBreathingRule : ISymptomRule
     {
         public SymptomType Type => SymptomType.SlowBreathing;
-        public bool IsActive(Patient p) => p.Physiology.Get(ParameterType.RespiratoryRate) < 10; // заметно ниже NormalMin(12), не просто нижняя граница нормы
+        public bool IsActive(Patient p) => p.Physiology.Get(ParameterType.RespiratoryRate) < 10;
     }
 
     public sealed class LeftArmWeaknessRule : ISymptomRule
