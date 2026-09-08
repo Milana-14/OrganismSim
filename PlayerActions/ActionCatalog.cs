@@ -21,6 +21,7 @@ public static class ActionCatalog
             new GiveWater(),
             new GiveJuice(),
             new GiveBiscuit(),
+            new GiveGlucagon(),
         };
     }
 }

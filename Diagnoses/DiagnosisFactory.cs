@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using OrganismSim.Core;
 
 namespace OrganismSim.Diagnoses;
@@ -19,7 +18,7 @@ public static class DiagnosisFactory
         [DiagnosisType.Anaphylaxis] = new AnaphylaxisProfile(),
         [DiagnosisType.MildAllergicReaction] = new MildAllergicReactionProfile(),
         [DiagnosisType.Hypothermia] =  new HypothermiaProfile(),
-        [DiagnosisType.Hyperthermia] = new MildAllergicReactionProfile(),
+        [DiagnosisType.Hyperthermia] = new HyperthermiaProfile(),
         [DiagnosisType.Dehydration] = new DehydrationProfile(),
     };
     public static IDiagnosisProfile GetProfile(DiagnosisType type) => Profiles[type];

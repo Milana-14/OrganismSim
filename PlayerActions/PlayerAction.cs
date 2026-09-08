@@ -44,7 +44,7 @@ public sealed class GiveJuice : IPlayerAction
         }
 
         patient.Physiology.Adjust(ParameterType.BloodGlucoseLevel, 6); // balance
-        patient.Absorptions.Enqueue(ParameterType.BloodGlucoseLevel, 32, 30); // balance
+        patient.Absorptions.Enqueue(ParameterType.BloodGlucoseLevel, 32, 50); // balance
         
         return new ActionResult(ActionOutcome.Success, "Дадохте 150 мл сок.");
     }
@@ -68,7 +68,7 @@ public sealed class GiveBiscuit : IPlayerAction
             return new ActionResult(ActionOutcome.Complication, "Бабата се задавя с бисквитката.");
         }
 
-        patient.Absorptions.Enqueue(ParameterType.BloodGlucoseLevel, 34, 60); // balance
+        patient.Absorptions.Enqueue(ParameterType.BloodGlucoseLevel, 34, 70); // balance
         return new ActionResult(ActionOutcome.Success, "Дадохте бисквитка.");
     }
 }
@@ -88,7 +88,7 @@ public sealed class GiveGlucagon : IPlayerAction
             patient.Exposure.RecordChoking();
         }
 
-        patient.Absorptions.Enqueue(ParameterType.BloodGlucoseLevel, 45 * 0.7, 90); // balance
+        patient.Absorptions.Enqueue(ParameterType.BloodGlucoseLevel, 45 * 0.7, 80); // balance
         patient.Pathology.Adjust(ConditionType.IncreasedSympatheticActivity, 1.5); // balance
 
         return vomits
